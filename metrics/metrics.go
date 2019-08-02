@@ -1,6 +1,8 @@
 package metrics
 
+import "time"
+
 // Get returns metrics
-func Get() (map[string]interface{}, error) {
-	return getMetrics()
+func Get(i time.Duration) (map[string]interface{}, error) {
+	return getMetrics(i)
 }

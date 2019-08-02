@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/k1LoW/metr/metrics"
 	"github.com/pkg/errors"
@@ -42,7 +43,7 @@ var getCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		m, err := metrics.Get()
+		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
@@ -64,15 +65,6 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
+	getCmd.Flags().IntVarP(&interval, "interval", "i", 0, "metrics calc interval (millisecond)")
 	rootCmd.AddCommand(getCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// getCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// getCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
