@@ -34,3 +34,22 @@ user:7.6438811331984535
 system:5.118152805446011
 guest_nice:0
 ```
+
+## Install
+
+**homebrew tap:**
+
+```console
+$ brew install k1LoW/tap/metr
+```
+
+**manually:**
+
+Download binany from [releases page](https://github.com/k1LoW/metr/releases)
+
+**go get:**
+
+```console
+$ go get github.com/k1LoW/metr
+```
+
