@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/antonmedv/expr"
 	"github.com/k1LoW/metr/metrics"
@@ -44,7 +45,7 @@ var condCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		mcond := args[0]
-		m, err := metrics.Get()
+		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
@@ -63,5 +64,6 @@ var condCmd = &cobra.Command{
 }
 
 func init() {
+	condCmd.Flags().IntVarP(&interval, "interval", "i", 0, "metrics calc interval (millisecond)")
 	rootCmd.AddCommand(condCmd)
 }
