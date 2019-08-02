@@ -7,7 +7,7 @@
 ### metr cond
 
 ``` console
-$ metr cond 'cpu > 10 or mem 90'
+$ metr cond 'cpu > 10 or mem > 90'
 ```
 
 if condition match `exit 0` else `exit 1`.
