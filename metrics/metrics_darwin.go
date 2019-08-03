@@ -98,6 +98,23 @@ func getMetrics(i time.Duration) (map[string]interface{}, error) {
 		total2 := ts2[0].Total()
 
 		total := total2 - total1
+		if total == 0 {
+			mutex.Lock()
+			m["user"] = ts2[0].User / total2 * 100
+			m["system"] = ts2[0].System / total2 * 100
+			m["idle"] = ts2[0].Idle / total2 * 100
+			m["nice"] = ts2[0].Nice / total2 * 100
+			m["iowait"] = ts2[0].Iowait / total2 * 100
+			m["irq"] = ts2[0].Irq / total2 * 100
+			m["softirq"] = ts2[0].Softirq / total2 * 100
+			m["steal"] = ts2[0].Steal / total2 * 100
+			m["guest"] = ts2[0].Guest / total2 * 100
+			m["guest_nice"] = ts2[0].GuestNice / total2 * 100
+			m["stolen"] = ts2[0].Stolen / total2 * 100
+			mutex.Unlock()
+			return
+		}
+
 		mutex.Lock()
 		m["user"] = (ts2[0].User - ts1[0].User) / total * 100
 		m["system"] = (ts2[0].System - ts1[0].System) / total * 100
