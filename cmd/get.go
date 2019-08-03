@@ -52,7 +52,7 @@ var getCmd = &cobra.Command{
 			for k, v := range m {
 				fmt.Printf("%s:%v\n", k, v)
 			}
-			os.Exit(1)
+			os.Exit(0)
 		}
 		for _, key := range args {
 			if _, ok := m[key]; !ok {
