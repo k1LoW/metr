@@ -12,6 +12,7 @@ import (
 )
 
 func getMetrics(i time.Duration) (map[string]interface{}, error) {
+	mutex := new(sync.Mutex)
 	wg := &sync.WaitGroup{}
 
 	m := map[string]interface{}{
@@ -40,7 +41,9 @@ func getMetrics(i time.Duration) (map[string]interface{}, error) {
 		if err != nil {
 			// TODO
 		}
+		mutex.Lock()
 		m["cpu"] = hostCpuPercent[0]
+		mutex.Unlock()
 		wg.Done()
 	}(wg)
 
@@ -48,13 +51,17 @@ func getMetrics(i time.Duration) (map[string]interface{}, error) {
 	if err != nil {
 		return map[string]interface{}{}, err
 	}
+	mutex.Lock()
 	m["mem"] = vm.UsedPercent
+	mutex.Unlock()
 
 	sw, err := mem.SwapMemory()
 	if err != nil {
 		return map[string]interface{}{}, err
 	}
+	mutex.Lock()
 	m["swap"] = sw.Used
+	mutex.Unlock()
 
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
@@ -66,7 +73,7 @@ func getMetrics(i time.Duration) (map[string]interface{}, error) {
 		total1 := ts1[0].Total()
 
 		if i == 0 {
-
+			mutex.Lock()
 			m["user"] = ts1[0].User / total1 * 100
 			m["system"] = ts1[0].System / total1 * 100
 			m["idle"] = ts1[0].Idle / total1 * 100
@@ -78,7 +85,7 @@ func getMetrics(i time.Duration) (map[string]interface{}, error) {
 			m["guest"] = ts1[0].Guest / total1 * 100
 			m["guest_nice"] = ts1[0].GuestNice / total1 * 100
 			m["stolen"] = ts1[0].Stolen / total1 * 100
-
+			mutex.Unlock()
 			return
 		}
 
@@ -91,6 +98,7 @@ func getMetrics(i time.Duration) (map[string]interface{}, error) {
 		total2 := ts2[0].Total()
 
 		total := total2 - total1
+		mutex.Lock()
 		m["user"] = (ts2[0].User - ts1[0].User) / total * 100
 		m["system"] = (ts2[0].System - ts1[0].System) / total * 100
 		m["idle"] = (ts2[0].Idle - ts1[0].Idle) / total * 100
@@ -102,15 +110,18 @@ func getMetrics(i time.Duration) (map[string]interface{}, error) {
 		m["guest"] = (ts2[0].Guest - ts1[0].Guest) / total * 100
 		m["guest_nice"] = (ts2[0].GuestNice - ts1[0].GuestNice) / total * 100
 		m["stolen"] = (ts2[0].Stolen - ts1[0].Stolen) / total * 100
+		mutex.Unlock()
 	}(wg)
 
 	l, err := load.Avg()
 	if err != nil {
 		return map[string]interface{}{}, err
 	}
+	mutex.Lock()
 	m["load1"] = l.Load1
 	m["load5"] = l.Load5
 	m["load15"] = l.Load15
+	mutex.Unlock()
 
 	wg.Wait()
 
