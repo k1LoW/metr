@@ -13,18 +13,18 @@ import (
 
 func availableMetrics() []Metric {
 	return []Metric{
-		{"cpu", "Percentage of cpu used.", "%f"},
-		{"mem", "Percentage of RAM used.", "%f"},
-		{"swap", "Amount of memory that has been swapped out to disk (bytes).", "%d"},
+		{"cpu", "Percentage of cpu used.", "%f", "%"},
+		{"mem", "Percentage of RAM used.", "%f", "%"},
+		{"swap", "Amount of memory that has been swapped out to disk (bytes).", "%d", "bytes"},
 
-		{"user", "Percentage of CPU utilization that occurred while executing at the user level.", "%f"},
-		{"system", "Percentage of CPU utilization that occurred while executing at the system level.", "%f"},
-		{"idle", "Percentage of time that CPUs were idle and the system did not have an outstanding disk I/O request.", "%f"},
-		{"nice", "Percentage of CPU utilization that occurred while executing at the user level with nice priority.", "%f"},
+		{"user", "Percentage of CPU utilization that occurred while executing at the user level.", "%f", "%"},
+		{"system", "Percentage of CPU utilization that occurred while executing at the system level.", "%f", "%"},
+		{"idle", "Percentage of time that CPUs were idle and the system did not have an outstanding disk I/O request.", "%f", "%"},
+		{"nice", "Percentage of CPU utilization that occurred while executing at the user level with nice priority.", "%f", "%"},
 
-		{"load1", "Load avarage for 1 minute.", "%f"},
-		{"load5", "Load avarage for 5 minutes.", "%f"},
-		{"load15", "Load avarage for 15 minutes.", "%f"},
+		{"load1", "Load avarage for 1 minute.", "%f", ""},
+		{"load5", "Load avarage for 5 minutes.", "%f", ""},
+		{"load15", "Load avarage for 15 minutes.", "%f", ""},
 	}
 }
 

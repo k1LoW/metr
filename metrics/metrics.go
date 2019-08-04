@@ -9,6 +9,7 @@ type Metric struct {
 	Name        string
 	Description string
 	Format      string
+	Unit        string
 }
 
 // Metrics struct
