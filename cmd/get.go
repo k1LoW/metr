@@ -34,8 +34,8 @@ import (
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get [METRIC_NAME]",
-	Short: "get",
-	Long:  `get.`,
+	Short: "get metrics",
+	Long:  `get metrics.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return errors.WithStack(errors.New("requires one arg"))

@@ -35,8 +35,8 @@ import (
 // condCmd represents the cond command
 var condCmd = &cobra.Command{
 	Use:   "cond [CONDITION]",
-	Short: "cond",
-	Long:  `cond.`,
+	Short: "returns CONDITION result using exit code",
+	Long:  `returns CONDITION result using exit code.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return errors.WithStack(errors.New("requires one arg"))

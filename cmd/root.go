@@ -33,8 +33,8 @@ var interval int
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "metr",
-	Short: "metr",
-	Long:  `metr.`,
+	Short: "metr gets system metrics",
+	Long:  `metr gets system metrics.`,
 }
 
 func Execute() {

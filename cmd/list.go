@@ -34,8 +34,8 @@ import (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list",
-	Long:  `list.`,
+	Short: "show available metrics",
+	Long:  `show available metrics.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if interval == 0 {
 			interval = 500

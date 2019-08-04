@@ -1,6 +1,6 @@
 # metr
 
-`metr` get system metrics
+`metr` gets system **metr**ics
 
 ## Usage
 
@@ -47,4 +47,3 @@ Download binany from [releases page](https://github.com/k1LoW/metr/releases)
 ```console
 $ go get github.com/k1LoW/metr
 ```
-
