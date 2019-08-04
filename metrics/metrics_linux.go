@@ -11,6 +11,30 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
+func availableMetrics() []Metric {
+	return []Metric{
+		{"cpu", "Percentage of cpu used.", "%f"},
+		{"mem", "Percentage of RAM used.", "%f"},
+		{"swap", "Amount of memory that has been swapped out to disk (bytes).", "%d"},
+
+		{"user", "Percentage of CPU utilization that occurred while executing at the user level.", "%f"},
+		{"system", "Percentage of CPU utilization that occurred while executing at the system level.", "%f"},
+		{"idle", "Percentage of time that CPUs were idle and the system did not have an outstanding disk I/O request.", "%f"},
+		{"nice", "Percentage of CPU utilization that occurred while executing at the user level with nice priority.", "%f"},
+
+		{"iowait", "Percentage of time that CPUs were idle during which the system had an outstanding disk I/O request.", "%f"},
+		{"irq", "Percentage of time spent by CPUs to service hardware interrupts.", "%f"},
+		{"softirq", "Percentage of time spent by CPUs to service software interrupts.", "%f"},
+		{"steal", "Percentage of time spent in involuntary wait by the virtual CPUs while the hypervisor was servicing another virtual processor.", "%f"},
+		{"guest", "Percentage of time spent by CPUs to run a virtual processor.", "%f"},
+		{"guest_nice", "Percentage of time spent by CPUs to run a virtual processor with nice priority.", "%f"},
+
+		{"load1", "Load avarage for 1 minute.", "%f"},
+		{"load5", "Load avarage for 5 minutes.", "%f"},
+		{"load15", "Load avarage for 15 minutes.", "%f"},
+	}
+}
+
 func getMetrics(i time.Duration) (*Metrics, error) {
 	wg := &sync.WaitGroup{}
 
@@ -57,7 +81,6 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 			m.Store("steal", ts1[0].Steal/total1*100)
 			m.Store("guest", ts1[0].Guest/total1*100)
 			m.Store("guest_nice", ts1[0].GuestNice/total1*100)
-			m.Store("stolen", ts1[0].Stolen/total1*100)
 			return
 		}
 
@@ -81,7 +104,6 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 			m.Store("steal", ts2[0].Steal/total2*100)
 			m.Store("guest", ts2[0].Guest/total2*100)
 			m.Store("guest_nice", ts2[0].GuestNice/total2*100)
-			m.Store("stolen", ts2[0].Stolen/total2*100)
 			return
 		}
 
@@ -95,7 +117,6 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 		m.Store("steal", (ts2[0].Steal-ts1[0].Steal)/total*100)
 		m.Store("guest", (ts2[0].Guest-ts1[0].Guest)/total*100)
 		m.Store("guest_nice", (ts2[0].GuestNice-ts1[0].GuestNice)/total*100)
-		m.Store("stolen", (ts2[0].Stolen-ts1[0].Stolen)/total*100)
 	}(wg)
 
 	l, err := load.Avg()
