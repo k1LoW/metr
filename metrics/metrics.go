@@ -5,12 +5,13 @@ import (
 	"time"
 )
 
+// Metrics struct
 type Metrics struct {
 	sync.Map
 	keys []string
 }
 
-// NewMetrics ...
+// NewMetrics returns *Metrics
 func NewMetrics() *Metrics {
 	m := &Metrics{
 		keys: []string{
@@ -36,6 +37,7 @@ func NewMetrics() *Metrics {
 	return m
 }
 
+// Each returns ordered metrics
 func (m *Metrics) Each(f func(key string, value interface{})) {
 	for _, key := range m.keys {
 		if value, ok := m.Load(key); ok {
