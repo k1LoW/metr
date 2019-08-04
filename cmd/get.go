@@ -57,7 +57,7 @@ var getCmd = &cobra.Command{
 		for _, key := range args {
 			v, ok := m.Load(key)
 			if ok {
-				fmt.Printf("%v\n", key, v)
+				fmt.Printf("%s:%v\n", key, v)
 			} else {
 				_, _ = fmt.Fprintf(os.Stderr, "%s does not exist\n", key)
 				os.Exit(1)
