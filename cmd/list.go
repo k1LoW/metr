@@ -27,47 +27,34 @@ import (
 	"time"
 
 	"github.com/k1LoW/metr/metrics"
-	"github.com/pkg/errors"
+	"github.com/labstack/gommon/color"
 	"github.com/spf13/cobra"
 )
 
-// getCmd represents the get command
-var getCmd = &cobra.Command{
-	Use:   "get [METRIC...]",
-	Short: "[WIP] get",
-	Long:  `[WIP] get.`,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 1 {
-			return errors.WithStack(errors.New("requires one arg"))
-		}
-		return nil
-	},
+// listCmd represents the list command
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list",
+	Long:  `list.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if interval == 0 {
+			interval = 500
+		}
 		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
 		}
-		if len(args) == 1 && args[0] == "all" {
-			m.Each(func(k string, v interface{}) {
-				fmt.Printf("%s:%v\n", k, v)
-			})
-			os.Exit(0)
-		}
-		for _, key := range args {
-			v, ok := m.Load(key)
-			if ok {
-				fmt.Printf("%s:%v\n", key, v)
-			} else {
-				_, _ = fmt.Fprintf(os.Stderr, "%s does not exist\n", key)
-				os.Exit(1)
+		for _, metric := range metrics.NewMetrics().List() {
+			if value, ok := m.Load(metric.Name); ok {
+				fmt.Printf("%s (now:%v): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Description)
 			}
-
 		}
+		fmt.Printf("(metric measurement interval: %v ms)\n", color.Cyan(interval))
 	},
 }
 
 func init() {
-	getCmd.Flags().IntVarP(&interval, "interval", "i", 0, "metric measurement interval (millisecond)")
-	rootCmd.AddCommand(getCmd)
+	listCmd.Flags().IntVarP(&interval, "interval", "i", 0, "metric measurement interval (millisecond)")
+	rootCmd.AddCommand(listCmd)
 }
