@@ -49,17 +49,20 @@ var getCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		if len(args) == 1 && args[0] == "all" {
-			for k, v := range m {
+			m.Each(func(k string, v interface{}) {
 				fmt.Printf("%s:%v\n", k, v)
-			}
+			})
 			os.Exit(0)
 		}
 		for _, key := range args {
-			if _, ok := m[key]; !ok {
+			v, ok := m.Load(key)
+			if ok {
+				fmt.Printf("%s:%v\n", key, v)
+			} else {
 				_, _ = fmt.Fprintf(os.Stderr, "%s does not exist\n", key)
 				os.Exit(1)
 			}
-			fmt.Printf("%s:%v\n", key, m[key])
+
 		}
 	},
 }
