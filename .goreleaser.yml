@@ -50,7 +50,7 @@ brews:
     name: k1LoW
     email: k1lowxb@gmail.com
   homepage: https://github.com/k1LoW/metr
-  description: 'metr.'
+  description: 'metr gets system metrics.'
   install: bin.install 'metr'
 nfpms:
   -
