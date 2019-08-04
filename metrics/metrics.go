@@ -44,18 +44,27 @@ func NewMetrics() *Metrics {
 	return m
 }
 
+func (m *Metrics) Format(key string) string {
+	for _, metric := range m.metrics {
+		if metric.Name == key {
+			return metric.Format
+		}
+	}
+	return "%v"
+}
+
 // List returns metric info list
 func (m *Metrics) List() []Metric {
 	return m.metrics
 }
 
 // Each returns ordered metrics
-func (m *Metrics) Each(f func(key string, value interface{})) {
+func (m *Metrics) Each(f func(key string, value interface{}, format string)) {
 	for _, metric := range m.metrics {
 		if value, ok := m.Load(metric.Name); ok {
-			f(metric.Name, value)
+			f(metric.Name, value, metric.Format)
 		} else {
-			f(metric.Name, 0)
+			f(metric.Name, 0, metric.Format)
 		}
 	}
 }
