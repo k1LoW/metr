@@ -64,59 +64,59 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
-		ts1, err := cpu.Times(false)
+		before, err := cpu.Times(false)
 		if err != nil {
 			// TODO
 		}
-		total1 := ts1[0].Total()
+		beforeTotal := before[0].Total()
 
 		if i == 0 {
-			m.Store("user", ts1[0].User/total1*100)
-			m.Store("system", ts1[0].System/total1*100)
-			m.Store("idle", ts1[0].Idle/total1*100)
-			m.Store("nice", ts1[0].Nice/total1*100)
-			m.Store("iowait", ts1[0].Iowait/total1*100)
-			m.Store("irq", ts1[0].Irq/total1*100)
-			m.Store("softirq", ts1[0].Softirq/total1*100)
-			m.Store("steal", ts1[0].Steal/total1*100)
-			m.Store("guest", ts1[0].Guest/total1*100)
-			m.Store("guest_nice", ts1[0].GuestNice/total1*100)
+			m.Store("user", before[0].User/beforeTotal*100)
+			m.Store("system", before[0].System/beforeTotal*100)
+			m.Store("idle", before[0].Idle/beforeTotal*100)
+			m.Store("nice", before[0].Nice/beforeTotal*100)
+			m.Store("iowait", before[0].Iowait/beforeTotal*100)
+			m.Store("irq", before[0].Irq/beforeTotal*100)
+			m.Store("softirq", before[0].Softirq/beforeTotal*100)
+			m.Store("steal", before[0].Steal/beforeTotal*100)
+			m.Store("guest", before[0].Guest/beforeTotal*100)
+			m.Store("guest_nice", before[0].GuestNice/beforeTotal*100)
 			return
 		}
 
 		time.Sleep(i)
 
-		ts2, err := cpu.Times(false)
+		after, err := cpu.Times(false)
 		if err != nil {
 			// TODO
 		}
-		total2 := ts2[0].Total()
+		afterTotal := after[0].Total()
 
-		total := total2 - total1
+		total := afterTotal - beforeTotal
 		if total == 0 {
-			m.Store("user", ts2[0].User/total2*100)
-			m.Store("system", ts2[0].System/total2*100)
-			m.Store("idle", ts2[0].Idle/total2*100)
-			m.Store("nice", ts2[0].Nice/total2*100)
-			m.Store("iowait", ts2[0].Iowait/total2*100)
-			m.Store("irq", ts2[0].Irq/total2*100)
-			m.Store("softirq", ts2[0].Softirq/total2*100)
-			m.Store("steal", ts2[0].Steal/total2*100)
-			m.Store("guest", ts2[0].Guest/total2*100)
-			m.Store("guest_nice", ts2[0].GuestNice/total2*100)
+			m.Store("user", after[0].User/afterTotal*100)
+			m.Store("system", after[0].System/afterTotal*100)
+			m.Store("idle", after[0].Idle/afterTotal*100)
+			m.Store("nice", after[0].Nice/afterTotal*100)
+			m.Store("iowait", after[0].Iowait/afterTotal*100)
+			m.Store("irq", after[0].Irq/afterTotal*100)
+			m.Store("softirq", after[0].Softirq/afterTotal*100)
+			m.Store("steal", after[0].Steal/afterTotal*100)
+			m.Store("guest", after[0].Guest/afterTotal*100)
+			m.Store("guest_nice", after[0].GuestNice/afterTotal*100)
 			return
 		}
 
-		m.Store("user", (ts2[0].User-ts1[0].User)/total*100)
-		m.Store("system", (ts2[0].System-ts1[0].System)/total*100)
-		m.Store("idle", (ts2[0].Idle-ts1[0].Idle)/total*100)
-		m.Store("nice", (ts2[0].Nice-ts1[0].Nice)/total*100)
-		m.Store("iowait", (ts2[0].Iowait-ts1[0].Iowait)/total*100)
-		m.Store("irq", (ts2[0].Irq-ts1[0].Irq)/total*100)
-		m.Store("softirq", (ts2[0].Softirq-ts1[0].Softirq)/total*100)
-		m.Store("steal", (ts2[0].Steal-ts1[0].Steal)/total*100)
-		m.Store("guest", (ts2[0].Guest-ts1[0].Guest)/total*100)
-		m.Store("guest_nice", (ts2[0].GuestNice-ts1[0].GuestNice)/total*100)
+		m.Store("user", (after[0].User-before[0].User)/total*100)
+		m.Store("system", (after[0].System-before[0].System)/total*100)
+		m.Store("idle", (after[0].Idle-before[0].Idle)/total*100)
+		m.Store("nice", (after[0].Nice-before[0].Nice)/total*100)
+		m.Store("iowait", (after[0].Iowait-before[0].Iowait)/total*100)
+		m.Store("irq", (after[0].Irq-before[0].Irq)/total*100)
+		m.Store("softirq", (after[0].Softirq-before[0].Softirq)/total*100)
+		m.Store("steal", (after[0].Steal-before[0].Steal)/total*100)
+		m.Store("guest", (after[0].Guest-before[0].Guest)/total*100)
+		m.Store("guest_nice", (after[0].GuestNice-before[0].GuestNice)/total*100)
 	}(wg)
 
 	l, err := load.Avg()

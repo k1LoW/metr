@@ -57,41 +57,41 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
-		ts1, err := cpu.Times(false)
+		before, err := cpu.Times(false)
 		if err != nil {
 			// TODO
 		}
-		total1 := ts1[0].Total()
+		beforeTotal := before[0].Total()
 
 		if i == 0 {
-			m.Store("user", ts1[0].User/total1*100)
-			m.Store("system", ts1[0].System/total1*100)
-			m.Store("idle", ts1[0].Idle/total1*100)
-			m.Store("nice", ts1[0].Nice/total1*100)
+			m.Store("user", before[0].User/beforeTotal*100)
+			m.Store("system", before[0].System/beforeTotal*100)
+			m.Store("idle", before[0].Idle/beforeTotal*100)
+			m.Store("nice", before[0].Nice/beforeTotal*100)
 			return
 		}
 
 		time.Sleep(i)
 
-		ts2, err := cpu.Times(false)
+		after, err := cpu.Times(false)
 		if err != nil {
 			// TODO
 		}
-		total2 := ts2[0].Total()
+		afterTotal := after[0].Total()
 
-		total := total2 - total1
+		total := afterTotal - beforeTotal
 		if total == 0 {
-			m.Store("user", ts2[0].User/total2*100)
-			m.Store("system", ts2[0].System/total2*100)
-			m.Store("idle", ts2[0].Idle/total2*100)
-			m.Store("nice", ts2[0].Nice/total2*100)
+			m.Store("user", after[0].User/afterTotal*100)
+			m.Store("system", after[0].System/afterTotal*100)
+			m.Store("idle", after[0].Idle/afterTotal*100)
+			m.Store("nice", after[0].Nice/afterTotal*100)
 			return
 		}
 
-		m.Store("user", (ts2[0].User-ts1[0].User)/total*100)
-		m.Store("system", (ts2[0].System-ts1[0].System)/total*100)
-		m.Store("idle", (ts2[0].Idle-ts1[0].Idle)/total*100)
-		m.Store("nice", (ts2[0].Nice-ts1[0].Nice)/total*100)
+		m.Store("user", (after[0].User-before[0].User)/total*100)
+		m.Store("system", (after[0].System-before[0].System)/total*100)
+		m.Store("idle", (after[0].Idle-before[0].Idle)/total*100)
+		m.Store("nice", (after[0].Nice-before[0].Nice)/total*100)
 	}(wg)
 
 	l, err := load.Avg()
