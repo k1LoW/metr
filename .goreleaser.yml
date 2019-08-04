@@ -52,3 +52,18 @@ brews:
   homepage: https://github.com/k1LoW/metr
   description: 'metr.'
   install: bin.install 'metr'
+nfpms:
+  -
+    id: metr-nfpms
+    name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Os }}_{{ .Arch }}"
+    builds:
+    - metr-linux
+    homepage: https://github.com/k1LoW/metr
+    maintainer: Ken'ichiro Oyama <k1lowxb@gmail.com>
+    description: metr gets system metrics.
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/local/bin
+    epoch: 1
