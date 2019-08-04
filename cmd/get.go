@@ -33,36 +33,35 @@ import (
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:   "get [METRIC...]",
-	Short: "[WIP] get",
-	Long:  `[WIP] get.`,
+	Use:   "get [METRIC_NAME]",
+	Short: "get",
+	Long:  `get.`,
 	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 1 {
+		if len(args) != 1 {
 			return errors.WithStack(errors.New("requires one arg"))
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		key := args[0]
+
 		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
 		}
-		if len(args) == 1 && args[0] == "all" {
-			m.Each(func(k string, v interface{}) {
-				fmt.Printf("%s:%v\n", k, v)
+		if len(args) == 1 && key == "all" {
+			m.Each(func(k string, v interface{}, format string) {
+				fmt.Printf("%s:%s\n", k, fmt.Sprintf(format, v))
 			})
 			os.Exit(0)
 		}
-		for _, key := range args {
-			v, ok := m.Load(key)
-			if ok {
-				fmt.Printf("%s:%v\n", key, v)
-			} else {
-				_, _ = fmt.Fprintf(os.Stderr, "%s does not exist\n", key)
-				os.Exit(1)
-			}
-
+		v, ok := m.Load(key)
+		if ok {
+			fmt.Printf("%s\n", fmt.Sprintf(m.Format(key), v))
+		} else {
+			_, _ = fmt.Fprintf(os.Stderr, "%s does not exist\n", key)
+			os.Exit(1)
 		}
 	},
 }
