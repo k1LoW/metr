@@ -67,6 +67,6 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	getCmd.Flags().IntVarP(&interval, "interval", "i", 0, "metric measurement interval (millisecond)")
+	getCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	rootCmd.AddCommand(getCmd)
 }

@@ -37,9 +37,6 @@ var listCmd = &cobra.Command{
 	Short: "show available metrics",
 	Long:  `show available metrics.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if interval == 0 {
-			interval = 500
-		}
 		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
@@ -55,6 +52,6 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	listCmd.Flags().IntVarP(&interval, "interval", "i", 0, "metric measurement interval (millisecond)")
+	listCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	rootCmd.AddCommand(listCmd)
 }
