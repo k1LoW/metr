@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.2.0](https://github.com/k1LoW/metr/compare/v0.1.1...v0.2.0) (2019-08-05)
+
+* Add `metr check` [#10](https://github.com/k1LoW/metr/pull/10) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.1.1](https://github.com/k1LoW/metr/compare/v0.1.0...v0.1.1) (2019-08-05)
 
 * Fix broken `metr cond` [#9](https://github.com/k1LoW/metr/pull/9) ([k1LoW](https://github.com/k1LoW))
