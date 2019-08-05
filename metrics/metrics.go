@@ -40,6 +40,18 @@ func (m *Metrics) List() []Metric {
 	return m.metrics
 }
 
+func (m *Metrics) Raw() map[string]interface{} {
+	metrics := map[string]interface{}{}
+	for _, metric := range m.metrics {
+		if value, ok := m.Load(metric.Name); ok {
+			metrics[metric.Name] = value
+		} else {
+			metrics[metric.Name] = 0
+		}
+	}
+	return metrics
+}
+
 // Each returns ordered metrics
 func (m *Metrics) Each(f func(key string, value interface{}, format string)) {
 	for _, metric := range m.metrics {
