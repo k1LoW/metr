@@ -48,7 +48,7 @@ var getCmd = &cobra.Command{
 	},
 }
 
-func runGet(args []string, interval int, stdout io.Writer, stderr io.Writer) (exitCode int) {
+func runGet(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
 	key := args[0]
 
 	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
