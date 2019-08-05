@@ -50,7 +50,7 @@ var condCmd = &cobra.Command{
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
 		}
-		got, err := expr.Eval(fmt.Sprintf("(%s) == true", mcond), m)
+		got, err := expr.Eval(fmt.Sprintf("(%s) == true", mcond), m.Raw())
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 			os.Exit(1)
