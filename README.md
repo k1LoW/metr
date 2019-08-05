@@ -10,11 +10,23 @@
 $ metr cond 'cpu > 10 or mem > 90'
 ```
 
-if condition match `exit 0` else `exit 1`.
+if condition match `exit 0` else `exit 1`, like `test` command.
 
 #### Available Operators
 
 `+`, `-`, `*`, `/`, `==`, `!=`, `<`, `>`, `<=`, `>=`, `not`, `and`, `or`, `!`, `&&`, `||`
+
+### metr check
+
+``` console
+$ metr check -w 'cpu > 10 or mem > 50' -c 'cpu > 50 and mem > 90'
+```
+
+`metr check` is compatible with
+
+- Nagios plugin
+- Mackerel check plugin `command`
+- Sensu checks
 
 ### metr get
 

@@ -61,9 +61,9 @@ var (
 
 // checkCmd represents the check command
 var checkCmd = &cobra.Command{
-	Use:   "check -w [CONDITION] -c [CONDITION]",
-	Short: "check metric condition using exit status code",
-	Long:  `check metric condition using exit status code.`,
+	Use:   "check -w [WARNING_CONDITION] -c [CRITICAL_CONDITION]",
+	Short: "check metrics condition and output result with exit status code",
+	Long:  `check metrics condition and output result with exit status code.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 0 {
 			exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires no args"))
