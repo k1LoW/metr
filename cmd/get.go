@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -43,27 +44,31 @@ var getCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		key := args[0]
-
-		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
-			os.Exit(1)
-		}
-		if len(args) == 1 && key == "all" {
-			m.Each(func(k string, v interface{}, format string) {
-				fmt.Printf("%s:%s\n", k, fmt.Sprintf(format, v))
-			})
-			os.Exit(0)
-		}
-		v, ok := m.Load(key)
-		if ok {
-			fmt.Printf("%s\n", fmt.Sprintf(m.Format(key), v))
-		} else {
-			_, _ = fmt.Fprintf(os.Stderr, "%s does not exist\n", key)
-			os.Exit(1)
-		}
+		os.Exit(runGet(args, interval, os.Stdout, os.Stderr))
 	},
+}
+
+func runGet(args []string, interval int, stdout io.Writer, stderr io.Writer) (exitCode int) {
+	key := args[0]
+
+	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "%s\n", err)
+		return 1
+	}
+	if len(args) == 1 && key == "all" {
+		m.Each(func(k string, v interface{}, format string) {
+			_, _ = fmt.Fprintf(stdout, "%s:%s\n", k, fmt.Sprintf(format, v))
+		})
+		return 0
+	}
+	v, ok := m.Load(key)
+	if !ok {
+		_, _ = fmt.Fprintf(stderr, "%s does not exist\n", key)
+		return 1
+	}
+	_, _ = fmt.Fprintf(stdout, "%s\n", fmt.Sprintf(m.Format(key), v))
+	return 0
 }
 
 func init() {
