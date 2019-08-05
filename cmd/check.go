@@ -75,7 +75,7 @@ var checkCmd = &cobra.Command{
 		if err != nil {
 			exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
 		}
-		got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m)
+		got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m.Raw())
 		if err != nil {
 			exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
 		}
@@ -83,7 +83,7 @@ var checkCmd = &cobra.Command{
 			exitWithStdout(CRITICAL, warningCond, criticalCond, nil)
 		}
 
-		got, err = expr.Eval(fmt.Sprintf("(%s) == true", warningCond), m)
+		got, err = expr.Eval(fmt.Sprintf("(%s) == true", warningCond), m.Raw())
 		if err != nil {
 			exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
 		}
