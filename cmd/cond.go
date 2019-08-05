@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -44,23 +45,27 @@ var condCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		mcond := args[0]
-		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
-			os.Exit(1)
-		}
-		got, err := expr.Eval(fmt.Sprintf("(%s) == true", mcond), m.Raw())
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
-			os.Exit(1)
-		}
-		if got.(bool) {
-			os.Exit(0)
-		} else {
-			os.Exit(1)
-		}
+		os.Exit(runCond(args, interval, os.Stdout, os.Stderr))
 	},
+}
+
+func runCond(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
+	mcond := args[0]
+	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "%s\n", err)
+		return 1
+	}
+	got, err := expr.Eval(fmt.Sprintf("(%s) == true", mcond), m.Raw())
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "%s\n", err)
+		return 1
+	}
+	if got.(bool) {
+		return 0
+	} else {
+		return 1
+	}
 }
 
 func init() {
