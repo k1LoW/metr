@@ -44,7 +44,7 @@ var listCmd = &cobra.Command{
 		}
 		for _, metric := range metrics.NewMetrics().List() {
 			if value, ok := m.Load(metric.Name); ok {
-				fmt.Printf("%s (now:%v): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Description)
+				fmt.Printf("%s (now:%v %s): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Unit, metric.Description)
 			}
 		}
 		fmt.Printf("(metric measurement interval: %v ms)\n", color.Cyan(interval))
