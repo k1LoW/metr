@@ -49,6 +49,7 @@ nice:0.000000
 load1:1.310000
 load5:1.410000
 load15:1.550000
+numcpu:8
 $ metr get cpu -i 500
 3.241895
 ```
@@ -67,6 +68,7 @@ nice (now:0.000000 %): Percentage of CPU utilization that occurred while executi
 load1 (now:3.640000 ): Load avarage for 1 minute.
 load5 (now:4.210000 ): Load avarage for 5 minutes.
 load15 (now:4.600000 ): Load avarage for 15 minutes.
+numcpu (now:8 ): Number of logical CPUs.
 (metric measurement interval: 500 ms)
 ```
 
