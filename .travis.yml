@@ -7,6 +7,10 @@ matrix:
     - go: master
 env: GO111MODULE=on
 install:
+  - sudo pip install codecov
   - echo $TRAVIS_GO_VERSION
 script:
   - make ci
+after_script:
+  - codecov
+
