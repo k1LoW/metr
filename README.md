@@ -1,4 +1,4 @@
-# metr [![Build Status](https://travis-ci.org/k1LoW/metr.svg?branch=master)](https://travis-ci.org/k1LoW/metr) [![GitHub release](https://img.shields.io/github/release/k1LoW/metr.svg)](https://github.com/k1LoW/metr/releases) 
+# metr [![Build Status](https://travis-ci.org/k1LoW/metr.svg?branch=master)](https://travis-ci.org/k1LoW/metr) [![GitHub release](https://img.shields.io/github/release/k1LoW/metr.svg)](https://github.com/k1LoW/metr/releases)
 
 `metr` gets system **metr**ics
 
@@ -27,6 +27,13 @@ $ metr check -w 'cpu > 10 or mem > 50' -c 'cpu > 50 and mem > 90'
 - Nagios plugin
 - Mackerel check plugin `command`
 - Sensu checks
+
+| Exit status code | Meaning  |
+| ---------------- | -------- |
+| 0	               | OK       |
+| 1                | WARNING  |
+| 2                | CRITICAL |
+| 3                | UNKNOWN  |
 
 ### `metr get`
 
