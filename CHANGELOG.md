@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.4.0](https://github.com/k1LoW/metr/compare/v0.3.0...v0.4.0) (2019-08-07)
+
+* Add metric `numcpu` [#14](https://github.com/k1LoW/metr/pull/14) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.3.0](https://github.com/k1LoW/metr/compare/v0.2.2...v0.3.0) (2019-08-06)
 
 * Handle error [#13](https://github.com/k1LoW/metr/pull/13) ([k1LoW](https://github.com/k1LoW))
