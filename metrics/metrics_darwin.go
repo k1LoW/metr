@@ -38,12 +38,12 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
-		hostCpuPercent, err := cpu.Percent(i, false)
+		cpuPercent, err := cpu.Percent(i, false)
 		if err != nil {
 			errChan <- err
 			return
 		}
-		m.Store("cpu", hostCpuPercent[0])
+		m.Store("cpu", cpuPercent[0])
 		wg.Done()
 	}(wg)
 
