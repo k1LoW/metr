@@ -18,6 +18,7 @@ func TestRunCheck(t *testing.T) {
 		{"metr check -w 'cpu > 100' -c 'cpu > 100'", "cpu > 100", "cpu > 100", 0, "METR OK: w(cpu > 100) c(cpu > 100)", ""},
 		{"metr check -w 'cpu < 100' -c 'cpu > 100'", "cpu < 100", "cpu > 100", 1, "METR WARNING: w(cpu < 100) c(cpu > 100)", ""},
 		{"metr check -w 'cpu >= 0' -c 'cpu < 100'", "cpu >= 0", "cpu < 100", 2, "METR CRITICAL: w(cpu >= 0) c(cpu < 100)", ""},
+		{"metr check -w 'cpu >= 0'", "cpu >= 0", "", 1, "METR WARNING: w(cpu >= 0) c()", ""},
 	}
 
 	for _, tt := range tests {

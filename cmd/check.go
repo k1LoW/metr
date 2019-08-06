@@ -100,20 +100,23 @@ func runCheck(args []string, warningCond, criticalCond string, interval int, std
 	if err != nil {
 		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
 	}
-	got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m.Raw())
-	if err != nil {
-		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+	if criticalCond != "" {
+		got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m.Raw())
+		if err != nil {
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+		}
+		if got.(bool) {
+			return r.exitWithStdout(CRITICAL, warningCond, criticalCond, nil)
+		}
 	}
-	if got.(bool) {
-		return r.exitWithStdout(CRITICAL, warningCond, criticalCond, nil)
-	}
-
-	got, err = expr.Eval(fmt.Sprintf("(%s) == true", warningCond), m.Raw())
-	if err != nil {
-		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
-	}
-	if got.(bool) {
-		return r.exitWithStdout(WARNING, warningCond, criticalCond, nil)
+	if warningCond != "" {
+		got, err := expr.Eval(fmt.Sprintf("(%s) == true", warningCond), m.Raw())
+		if err != nil {
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+		}
+		if got.(bool) {
+			return r.exitWithStdout(WARNING, warningCond, criticalCond, nil)
+		}
 	}
 
 	return r.exitWithStdout(OK, warningCond, criticalCond, nil)
