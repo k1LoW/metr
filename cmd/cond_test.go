@@ -14,7 +14,7 @@ func TestRunCond(t *testing.T) {
 		wantStderr   string
 	}{
 		{"metr cond 'cpu > 100'", []string{"cpu > 100"}, 1, ""},
-		{"metr cond 'cpu > 0'", []string{"cpu > 0"}, 0, ""},
+		{"metr cond 'cpu >= 0'", []string{"cpu >= 0"}, 0, ""},
 		{"metr cond 'cpu > 100 or mem < 100'", []string{"cpu > 100 or mem < 100"}, 0, ""},
 		{"metr cond 'foo > 10'", []string{"foo"}, 1, "undefined: foo"},
 	}

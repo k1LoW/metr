@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -54,6 +55,21 @@ func (s Status) String() string {
 	}
 }
 
+type Result struct {
+	stdout io.Writer
+	stderr io.Writer
+}
+
+func (r *Result) exitWithStdout(status Status, warningCond string, criticalCond string, err error) int {
+	// SERVICE STATUS: First line of output | First part of performance data http://nagios-plugins.org/doc/guidelines.html#PLUGOUTPUT
+	if err != nil {
+		_, _ = fmt.Fprintf(r.stdout, "%s %s: %s\n", "METR", status, err)
+	} else {
+		_, _ = fmt.Fprintf(r.stdout, "%s %s: w(%s) c(%s)\n", "METR", status, warningCond, criticalCond)
+	}
+	return int(status)
+}
+
 var (
 	warningCond  string
 	criticalCond string
@@ -65,34 +81,42 @@ var checkCmd = &cobra.Command{
 	Short: "check metrics condition and output result with exit status code",
 	Long:  `check metrics condition and output result with exit status code.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires no args"))
-		}
-		if warningCond == "" && criticalCond == "" {
-			exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires -w or -c option"))
-		}
-		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
-		if err != nil {
-			exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
-		}
-		got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m.Raw())
-		if err != nil {
-			exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
-		}
-		if got.(bool) {
-			exitWithStdout(CRITICAL, warningCond, criticalCond, nil)
-		}
-
-		got, err = expr.Eval(fmt.Sprintf("(%s) == true", warningCond), m.Raw())
-		if err != nil {
-			exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
-		}
-		if got.(bool) {
-			exitWithStdout(WARNING, warningCond, criticalCond, nil)
-		}
-
-		exitWithStdout(OK, warningCond, criticalCond, nil)
+		os.Exit(runCheck(args, warningCond, criticalCond, interval, os.Stdout, os.Stderr))
 	},
+}
+
+func runCheck(args []string, warningCond, criticalCond string, interval int, stdout, stderr io.Writer) (exitCode int) {
+	r := &Result{
+		stdout: stdout,
+		stderr: stderr,
+	}
+	if len(args) > 0 {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires no args"))
+	}
+	if warningCond == "" && criticalCond == "" {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires -w or -c option"))
+	}
+	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
+	if err != nil {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+	}
+	got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m.Raw())
+	if err != nil {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+	}
+	if got.(bool) {
+		return r.exitWithStdout(CRITICAL, warningCond, criticalCond, nil)
+	}
+
+	got, err = expr.Eval(fmt.Sprintf("(%s) == true", warningCond), m.Raw())
+	if err != nil {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+	}
+	if got.(bool) {
+		return r.exitWithStdout(WARNING, warningCond, criticalCond, nil)
+	}
+
+	return r.exitWithStdout(OK, warningCond, criticalCond, nil)
 }
 
 func init() {
@@ -100,14 +124,4 @@ func init() {
 	checkCmd.Flags().StringVarP(&warningCond, "warning", "w", "", "WARNING condition")
 	checkCmd.Flags().StringVarP(&criticalCond, "critical", "c", "", "CRITICAL condition")
 	checkCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
-}
-
-func exitWithStdout(status Status, warningCond string, criticalCond string, err error) {
-	// SERVICE STATUS: First line of output | First part of performance data http://nagios-plugins.org/doc/guidelines.html#PLUGOUTPUT
-	if err != nil {
-		fmt.Printf("%s %s: %s\n", "METR", status, err)
-		os.Exit(int(status))
-	}
-	fmt.Printf("%s %s: w:(%s) c:(%s)\n", "METR", status, warningCond, criticalCond)
-	os.Exit(int(status))
 }
