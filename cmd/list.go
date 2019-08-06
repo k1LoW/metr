@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -37,18 +38,23 @@ var listCmd = &cobra.Command{
 	Short: "show available metrics",
 	Long:  `show available metrics.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
-			os.Exit(1)
-		}
-		for _, metric := range metrics.NewMetrics().List() {
-			if value, ok := m.Load(metric.Name); ok {
-				fmt.Printf("%s (now:%v %s): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Unit, metric.Description)
-			}
-		}
-		fmt.Printf("(metric measurement interval: %v ms)\n", color.Cyan(interval))
+		os.Exit(runList(args, interval, os.Stdout, os.Stderr))
 	},
+}
+
+func runList(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
+	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "%s\n", err)
+		return 1
+	}
+	for _, metric := range metrics.NewMetrics().List() {
+		if value, ok := m.Load(metric.Name); ok {
+			_, _ = fmt.Fprintf(stdout, "%s (now:%v %s): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Unit, metric.Description)
+		}
+	}
+	_, _ = fmt.Fprintf(stdout, "(metric measurement interval: %v ms)\n", color.Cyan(interval))
+	return 0
 }
 
 func init() {
