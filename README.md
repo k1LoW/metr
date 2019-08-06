@@ -80,7 +80,7 @@ $ brew install k1LoW/tap/metr
 
 **manually:**
 
-Download binany from [releases page](https://github.com/k1LoW/metr/releases)
+Download binany/deb/rpm from [releases page](https://github.com/k1LoW/metr/releases)
 
 **go get:**
 
