@@ -51,7 +51,7 @@ var condCmd = &cobra.Command{
 
 func runCond(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
 	mcond := args[0]
-	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
+	m, err := metrics.Collect(time.Duration(interval) * time.Millisecond)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "%s\n", err)
 		return 1

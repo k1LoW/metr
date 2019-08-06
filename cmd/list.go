@@ -35,24 +35,22 @@ import (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "show available metrics",
-	Long:  `show available metrics.`,
+	Short: "list available metrics",
+	Long:  `list available metrics.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		os.Exit(runList(args, interval, os.Stdout, os.Stderr))
 	},
 }
 
 func runList(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
-	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
+	m, err := metrics.Collect(time.Duration(interval) * time.Millisecond)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "%s\n", err)
 		return 1
 	}
-	for _, metric := range metrics.NewMetrics().List() {
-		if value, ok := m.Load(metric.Name); ok {
-			_, _ = fmt.Fprintf(stdout, "%s (now:%v %s): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Unit, metric.Description)
-		}
-	}
+	m.Each(func(metric metrics.Metric, value interface{}) {
+		_, _ = fmt.Fprintf(stdout, "%s (now:%v %s): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Unit, metric.Description)
+	})
 	_, _ = fmt.Fprintf(stdout, "(metric measurement interval: %v ms)\n", color.Cyan(interval))
 	return 0
 }

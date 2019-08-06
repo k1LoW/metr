@@ -15,13 +15,15 @@ type Metric struct {
 // Metrics struct
 type Metrics struct {
 	sync.Map
-	metrics []Metric
+	interval time.Duration
+	metrics  []Metric
 }
 
 // NewMetrics returns *Metrics
-func NewMetrics() *Metrics {
+func NewMetrics(i time.Duration) *Metrics {
 	m := &Metrics{
-		metrics: availableMetrics(),
+		interval: i,
+		metrics:  AvailableMetrics(),
 	}
 	return m
 }
@@ -33,11 +35,6 @@ func (m *Metrics) Format(key string) string {
 		}
 	}
 	return "%v"
-}
-
-// List returns metric info list
-func (m *Metrics) List() []Metric {
-	return m.metrics
 }
 
 func (m *Metrics) Raw() map[string]interface{} {
@@ -63,7 +60,7 @@ func (m *Metrics) Each(f func(metric Metric, value interface{})) {
 	}
 }
 
-// Get returns metrics
-func Get(i time.Duration) (*Metrics, error) {
-	return getMetrics(i)
+// Collect returns metrics
+func Collect(i time.Duration) (*Metrics, error) {
+	return NewMetrics(i).Collect()
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
-func availableMetrics() []Metric {
+func AvailableMetrics() []Metric {
 	return []Metric{
 		{"cpu", "Percentage of cpu used.", "%f", "%"},
 		{"mem", "Percentage of RAM used.", "%f", "%"},
@@ -28,17 +28,15 @@ func availableMetrics() []Metric {
 	}
 }
 
-func getMetrics(i time.Duration) (*Metrics, error) {
+func (m *Metrics) Collect() (*Metrics, error) {
 	wg := &sync.WaitGroup{}
-
-	m := NewMetrics()
 
 	// 2 = goroutine count
 	errChan := make(chan error, 2)
 
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
-		cpuPercent, err := cpu.Percent(i, false)
+		cpuPercent, err := cpu.Percent(m.interval, false)
 		if err != nil {
 			errChan <- err
 			return
@@ -68,7 +66,7 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 		}
 		beforeTotal := before[0].Total()
 
-		if i == 0 {
+		if m.interval == 0 {
 			m.Store("user", before[0].User/beforeTotal*100)
 			m.Store("system", before[0].System/beforeTotal*100)
 			m.Store("idle", before[0].Idle/beforeTotal*100)
@@ -76,7 +74,7 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 			return
 		}
 
-		time.Sleep(i)
+		time.Sleep(m.interval)
 
 		after, err := cpu.Times(false)
 		if err != nil {

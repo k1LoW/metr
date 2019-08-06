@@ -35,8 +35,8 @@ import (
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get [METRIC_NAME]",
-	Short: "get metrics",
-	Long:  `get metrics.`,
+	Short: "get metric[s]",
+	Long:  `get metric[s].`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return errors.WithStack(errors.New("requires one arg"))
@@ -51,7 +51,7 @@ var getCmd = &cobra.Command{
 func runGet(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
 	key := args[0]
 
-	m, err := metrics.Get(time.Duration(interval) * time.Millisecond)
+	m, err := metrics.Collect(time.Duration(interval) * time.Millisecond)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "%s\n", err)
 		return 1
