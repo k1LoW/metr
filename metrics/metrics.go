@@ -37,6 +37,7 @@ func (m *Metrics) Format(key string) string {
 	return "%v"
 }
 
+// Raw returns raw metrics map
 func (m *Metrics) Raw() map[string]interface{} {
 	metrics := map[string]interface{}{}
 	for _, metric := range m.metrics {

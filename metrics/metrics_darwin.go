@@ -3,6 +3,7 @@
 package metrics
 
 import (
+	"runtime"
 	"sync"
 	"time"
 
@@ -25,6 +26,8 @@ func AvailableMetrics() []Metric {
 		{"load1", "Load avarage for 1 minute.", "%f", ""},
 		{"load5", "Load avarage for 5 minutes.", "%f", ""},
 		{"load15", "Load avarage for 15 minutes.", "%f", ""},
+
+		{"numcpu", "Number of logical CPUs.", "%d", ""},
 	}
 }
 
@@ -105,6 +108,8 @@ func (m *Metrics) Collect() (*Metrics, error) {
 	m.Store("load1", l.Load1)
 	m.Store("load5", l.Load5)
 	m.Store("load15", l.Load15)
+
+	m.Store("numcpu", runtime.NumCPU())
 
 	wg.Wait()
 
