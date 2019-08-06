@@ -57,8 +57,8 @@ func runGet(args []string, interval int, stdout, stderr io.Writer) (exitCode int
 		return 1
 	}
 	if len(args) == 1 && key == "all" {
-		m.Each(func(k string, v interface{}, format string) {
-			_, _ = fmt.Fprintf(stdout, "%s:%s\n", k, fmt.Sprintf(format, v))
+		m.Each(func(metric metrics.Metric, v interface{}) {
+			_, _ = fmt.Fprintf(stdout, "%s:%s\n", metric.Name, fmt.Sprintf(metric.Format, v))
 		})
 		return 0
 	}

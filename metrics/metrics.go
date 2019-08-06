@@ -53,12 +53,12 @@ func (m *Metrics) Raw() map[string]interface{} {
 }
 
 // Each returns ordered metrics
-func (m *Metrics) Each(f func(key string, value interface{}, format string)) {
+func (m *Metrics) Each(f func(metric Metric, value interface{})) {
 	for _, metric := range m.metrics {
 		if value, ok := m.Load(metric.Name); ok {
-			f(metric.Name, value, metric.Format)
+			f(metric, value)
 		} else {
-			f(metric.Name, 0, metric.Format)
+			f(metric, 0)
 		}
 	}
 }
