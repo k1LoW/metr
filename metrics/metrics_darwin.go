@@ -33,13 +33,17 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 
 	m := NewMetrics()
 
+	// 2 = goroutine count
+	errChan := make(chan error, 2)
+
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
-		hostCpuPercent, err := cpu.Percent(i, false)
+		cpuPercent, err := cpu.Percent(i, false)
 		if err != nil {
-			// TODO
+			errChan <- err
+			return
 		}
-		m.Store("cpu", hostCpuPercent[0])
+		m.Store("cpu", cpuPercent[0])
 		wg.Done()
 	}(wg)
 
@@ -59,7 +63,8 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 		defer wg.Done()
 		before, err := cpu.Times(false)
 		if err != nil {
-			// TODO
+			errChan <- err
+			return
 		}
 		beforeTotal := before[0].Total()
 
@@ -75,7 +80,8 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 
 		after, err := cpu.Times(false)
 		if err != nil {
-			// TODO
+			errChan <- err
+			return
 		}
 		afterTotal := after[0].Total()
 
@@ -103,6 +109,12 @@ func getMetrics(i time.Duration) (*Metrics, error) {
 	m.Store("load15", l.Load15)
 
 	wg.Wait()
+
+	select {
+	case err := <-errChan:
+		return nil, err
+	default:
+	}
 
 	return m, nil
 }
