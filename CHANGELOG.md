@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.2.2](https://github.com/k1LoW/metr/compare/v0.2.1...v0.2.2) (2019-08-06)
+
+* Add test [#12](https://github.com/k1LoW/metr/pull/12) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.2.1](https://github.com/k1LoW/metr/compare/v0.2.0...v0.2.1) (2019-08-05)
 
 * Change bindir (deb, rpm) `/usr/local/bin` -> `/usr/bin` [#11](https://github.com/k1LoW/metr/pull/11) ([k1LoW](https://github.com/k1LoW))
