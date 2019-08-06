@@ -31,7 +31,7 @@ func AvailableMetrics() []Metric {
 	}
 }
 
-func (m *Metrics) Collect() (*Metrics, error) {
+func (m *Metrics) Collect() error {
 	wg := &sync.WaitGroup{}
 
 	// 2 = goroutine count
@@ -50,13 +50,13 @@ func (m *Metrics) Collect() (*Metrics, error) {
 
 	vm, err := mem.VirtualMemory()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	m.Store("mem", vm.UsedPercent)
 	sw, err := mem.SwapMemory()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	m.Store("swap", sw.Used)
 	wg.Add(1)
@@ -103,7 +103,7 @@ func (m *Metrics) Collect() (*Metrics, error) {
 
 	l, err := load.Avg()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	m.Store("load1", l.Load1)
 	m.Store("load5", l.Load5)
@@ -115,9 +115,9 @@ func (m *Metrics) Collect() (*Metrics, error) {
 
 	select {
 	case err := <-errChan:
-		return nil, err
+		return err
 	default:
 	}
 
-	return m, nil
+	return nil
 }

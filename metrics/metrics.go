@@ -61,7 +61,12 @@ func (m *Metrics) Each(f func(metric Metric, value interface{})) {
 	}
 }
 
-// Collect returns metrics
-func Collect(i time.Duration) (*Metrics, error) {
-	return NewMetrics(i).Collect()
+// GetMetrics returns metrics
+func GetMetrics(i time.Duration) (*Metrics, error) {
+	m := NewMetrics(i)
+	err := m.Collect()
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
 }

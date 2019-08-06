@@ -96,7 +96,7 @@ func runCheck(args []string, warningCond, criticalCond string, interval int, std
 	if warningCond == "" && criticalCond == "" {
 		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires -w or -c option"))
 	}
-	m, err := metrics.Collect(time.Duration(interval) * time.Millisecond)
+	m, err := metrics.GetMetrics(time.Duration(interval) * time.Millisecond)
 	if err != nil {
 		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
 	}

@@ -43,7 +43,7 @@ var listCmd = &cobra.Command{
 }
 
 func runList(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
-	m, err := metrics.Collect(time.Duration(interval) * time.Millisecond)
+	m, err := metrics.GetMetrics(time.Duration(interval) * time.Millisecond)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "%s\n", err)
 		return 1
