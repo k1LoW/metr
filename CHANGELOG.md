@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.3.0](https://github.com/k1LoW/metr/compare/v0.2.2...v0.3.0) (2019-08-06)
+
+* Handle error [#13](https://github.com/k1LoW/metr/pull/13) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.2.2](https://github.com/k1LoW/metr/compare/v0.2.1...v0.2.2) (2019-08-06)
 
 * Add test [#12](https://github.com/k1LoW/metr/pull/12) ([k1LoW](https://github.com/k1LoW))
