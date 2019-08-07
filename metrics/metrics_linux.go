@@ -46,7 +46,7 @@ func (m *Metrics) Collect() error {
 
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
-		cpuPercent, err := cpu.Percent(m.interval, false)
+		cpuPercent, err := cpu.Percent(m.collectInterval, false)
 		if err != nil {
 			errChan <- err
 			return
@@ -76,7 +76,7 @@ func (m *Metrics) Collect() error {
 		}
 		beforeTotal := before[0].Total()
 
-		if m.interval == 0 {
+		if m.collectInterval == 0 {
 			m.Store("user", before[0].User/beforeTotal*100)
 			m.Store("system", before[0].System/beforeTotal*100)
 			m.Store("idle", before[0].Idle/beforeTotal*100)
@@ -90,7 +90,7 @@ func (m *Metrics) Collect() error {
 			return
 		}
 
-		time.Sleep(m.interval)
+		time.Sleep(m.collectInterval)
 
 		after, err := cpu.Times(false)
 		if err != nil {

@@ -15,15 +15,15 @@ type Metric struct {
 // Metrics struct
 type Metrics struct {
 	sync.Map
-	interval time.Duration
-	metrics  []Metric
+	collectInterval time.Duration
+	metrics         []Metric
 }
 
 // NewMetrics returns *Metrics
 func NewMetrics(i time.Duration) *Metrics {
 	m := &Metrics{
-		interval: i,
-		metrics:  AvailableMetrics(),
+		collectInterval: i,
+		metrics:         AvailableMetrics(),
 	}
 	return m
 }
