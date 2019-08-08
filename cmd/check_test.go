@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"os"
 	"strings"
 	"testing"
 )
@@ -20,6 +21,8 @@ func TestRunCheck(t *testing.T) {
 		{"metr check -w 'cpu < 100' -c 'cpu > 100'", "cpu < 100", "cpu > 100", 0, 1, "METR WARNING: w(cpu < 100) c(cpu > 100)", ""},
 		{"metr check -w 'cpu >= 0' -c 'cpu < 100'", "cpu >= 0", "cpu < 100", 0, 2, "METR CRITICAL: w(cpu >= 0) c(cpu < 100)", ""},
 		{"metr check -w 'cpu >= 0'", "cpu >= 0", "", 0, 1, "METR WARNING: w(cpu >= 0) c()", ""},
+		{"metr check -w 'proc_cpu >= 0'", "proc_cpu >= 0", "", 0, 3, "METR UNKNOWN: undefined: proc_cpu", ""},
+		{"metr check -w 'proc_cpu >= 0' -p $PID", "proc_cpu >= 0", "", int32(os.Getpid()), 1, "METR WARNING: w(proc_cpu >= 0) c()", ""},
 	}
 
 	for _, tt := range tests {

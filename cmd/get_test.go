@@ -21,8 +21,8 @@ func TestRunGet(t *testing.T) {
 		{"metr get foo", []string{"foo"}, 0, 1, regexp.MustCompile(`^$`), "foo does not exist"},
 		{"metr get all", []string{"all"}, 0, 0, regexp.MustCompile(`user:\d+\.\d+\n`), ""},
 		{"metr get proc_cpu", []string{"proc_cpu"}, 0, 1, regexp.MustCompile(`^$`), "proc_cpu does not exist"},
-		{"metr get proc_cpu -p 1", []string{"proc_cpu"}, int32(os.Getpid()), 0, regexp.MustCompile(`^\d+\.\d+$`), ""},
-		{"metr get all -p 1`", []string{"all"}, int32(os.Getpid()), 0, regexp.MustCompile(`proc_cpu:\d+\.\d+\n`), ""},
+		{"metr get proc_cpu -p $PID", []string{"proc_cpu"}, int32(os.Getpid()), 0, regexp.MustCompile(`^\d+\.\d+$`), ""},
+		{"metr get all -p $PID`", []string{"all"}, int32(os.Getpid()), 0, regexp.MustCompile(`proc_cpu:\d+\.\d+\n`), ""},
 	}
 
 	for _, tt := range tests {

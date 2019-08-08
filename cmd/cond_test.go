@@ -20,7 +20,7 @@ func TestRunCond(t *testing.T) {
 		{"metr cond 'cpu > 100 or mem < 100'", []string{"cpu > 100 or mem < 100"}, 0, 0, ""},
 		{"metr cond 'foo > 10'", []string{"foo > 10"}, 0, 1, "undefined: foo"},
 		{"metr cond 'proc_cpu >= 0'", []string{"proc_cpu >= 0"}, 0, 1, "undefined: proc_cpu"},
-		{"metr cond 'proc_cpu >= 0' -p 1", []string{"proc_cpu >= 0"}, int32(os.Getpid()), 0, ""},
+		{"metr cond 'proc_cpu >= 0' -p $PID", []string{"proc_cpu >= 0"}, int32(os.Getpid()), 0, ""},
 	}
 
 	for _, tt := range tests {
