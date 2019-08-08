@@ -39,7 +39,7 @@ var getCmd = &cobra.Command{
 	Long:  `get metric[s].`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
-			return errors.WithStack(errors.New("requires one arg"))
+			return errors.WithStack(errors.New("metr requires one arg"))
 		}
 		return nil
 	},

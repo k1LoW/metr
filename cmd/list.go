@@ -29,6 +29,7 @@ import (
 
 	"github.com/k1LoW/metr/metrics"
 	"github.com/labstack/gommon/color"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -37,6 +38,12 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list available metrics",
 	Long:  `list available metrics.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			return errors.WithStack(errors.New("metr requires no args"))
+		}
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		os.Exit(runList(args, interval, pid, os.Stdout, os.Stderr))
 	},

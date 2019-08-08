@@ -39,7 +39,7 @@ METR WARNING: w(cpu > 10 or mem > 50) c(cpu > 50 and mem > 90)
 ### `metr get`
 
 ``` console
-$ metr get all -i 500
+$ metr get all
 cpu:4.239401
 mem:64.362717
 swap:61603840
@@ -51,7 +51,7 @@ load1:1.310000
 load5:1.410000
 load15:1.550000
 numcpu:8
-$ metr get cpu -i 500
+$ metr get cpu
 3.241895
 ```
 
