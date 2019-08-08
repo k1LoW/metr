@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -15,6 +16,7 @@ func TestRunList(t *testing.T) {
 		wantStderr string
 	}{
 		{"metr list", 0, regexp.MustCompile(`user \(now:\d+\.\d+ %\)`), ""},
+		{"metr list", int32(os.Getpid()), regexp.MustCompile(`proc_cpu \(now:\d+\.\d+ %\)`), ""},
 	}
 
 	for _, tt := range tests {
