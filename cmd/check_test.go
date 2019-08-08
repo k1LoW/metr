@@ -25,18 +25,18 @@ func TestRunCheck(t *testing.T) {
 	for _, tt := range tests {
 		stdout := new(bytes.Buffer)
 		stderr := new(bytes.Buffer)
-		exitCode := runCheck([]string{}, tt.warningCond, tt.criticalCond, 500, tt.pid, stdout, stderr)
+		exitCode := runCheck([]string{}, tt.warningCond, tt.criticalCond, 100, tt.pid, stdout, stderr)
 		_ = stdout.String()
 		if exitCode != tt.wantExitCode {
-			t.Errorf("runCheck([], %s, %s, 500, stdout, stderr) = %d, want = %d", tt.warningCond, tt.criticalCond, exitCode, tt.wantExitCode)
+			t.Errorf("runCheck([], %s, %s, 100, stdout, stderr) = %d, want = %d", tt.warningCond, tt.criticalCond, exitCode, tt.wantExitCode)
 		}
 		got := strings.TrimSuffix(stdout.String(), "\n")
 		if tt.wantStdout != got {
-			t.Errorf("runCheck([], %s, %s, 500, stdout, stderr) stdout = %s, want = %v", tt.warningCond, tt.criticalCond, got, tt.wantStdout)
+			t.Errorf("runCheck([], %s, %s, 100, stdout, stderr) stdout = %s, want = %v", tt.warningCond, tt.criticalCond, got, tt.wantStdout)
 		}
 		got = strings.TrimSuffix(stderr.String(), "\n")
 		if tt.wantStderr != got {
-			t.Errorf("runCheck([], %s, %s, 500, stdout, stderr) stderr = %s, want = %v", tt.warningCond, tt.criticalCond, got, tt.wantStderr)
+			t.Errorf("runCheck([], %s, %s, 100, stdout, stderr) stderr = %s, want = %v", tt.warningCond, tt.criticalCond, got, tt.wantStderr)
 		}
 	}
 }
