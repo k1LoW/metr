@@ -10,7 +10,7 @@ install:
   - sudo pip install codecov
   - echo $TRAVIS_GO_VERSION
 script:
-  - make ci
+  - sudo make ci
 after_script:
   - codecov
 
