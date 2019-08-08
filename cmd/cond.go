@@ -45,13 +45,13 @@ var condCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCond(args, interval, os.Stdout, os.Stderr))
+		os.Exit(runCond(args, interval, pid, os.Stdout, os.Stderr))
 	},
 }
 
-func runCond(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
+func runCond(args []string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
 	mcond := args[0]
-	m, err := metrics.GetMetrics(time.Duration(interval) * time.Millisecond)
+	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "%s\n", err)
 		return 1
@@ -70,5 +70,6 @@ func runCond(args []string, interval int, stdout, stderr io.Writer) (exitCode in
 
 func init() {
 	condCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
+	condCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	rootCmd.AddCommand(condCmd)
 }

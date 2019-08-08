@@ -11,19 +11,20 @@ func TestRunGet(t *testing.T) {
 	tests := []struct {
 		name         string
 		args         []string
+		pid          int32
 		wantExitCode int
 		wantStdout   *regexp.Regexp
 		wantStderr   string
 	}{
-		{"metr get cpu", []string{"cpu"}, 0, regexp.MustCompile(`^\d+\.\d+$`), ""},
-		{"metr get foo", []string{"foo"}, 1, regexp.MustCompile(`^$`), "foo does not exist"},
-		{"metr get all", []string{"all"}, 0, regexp.MustCompile(`user:\d+\.\d+\n`), ""},
+		{"metr get cpu", []string{"cpu"}, 0, 0, regexp.MustCompile(`^\d+\.\d+$`), ""},
+		{"metr get foo", []string{"foo"}, 0, 1, regexp.MustCompile(`^$`), "foo does not exist"},
+		{"metr get all", []string{"all"}, 0, 0, regexp.MustCompile(`user:\d+\.\d+\n`), ""},
 	}
 
 	for _, tt := range tests {
 		stdout := new(bytes.Buffer)
 		stderr := new(bytes.Buffer)
-		exitCode := runGet(tt.args, 500, stdout, stderr)
+		exitCode := runGet(tt.args, 500, tt.pid, stdout, stderr)
 		_ = stdout.String()
 		if exitCode != tt.wantExitCode {
 			t.Errorf("runGet(%v, 500, stdout, stderr) = %d, want = %d", tt.args, exitCode, tt.wantExitCode)

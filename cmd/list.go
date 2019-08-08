@@ -38,12 +38,12 @@ var listCmd = &cobra.Command{
 	Short: "list available metrics",
 	Long:  `list available metrics.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runList(args, interval, os.Stdout, os.Stderr))
+		os.Exit(runList(args, interval, pid, os.Stdout, os.Stderr))
 	},
 }
 
-func runList(args []string, interval int, stdout, stderr io.Writer) (exitCode int) {
-	m, err := metrics.GetMetrics(time.Duration(interval) * time.Millisecond)
+func runList(args []string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
+	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "%s\n", err)
 		return 1
@@ -57,5 +57,6 @@ func runList(args []string, interval int, stdout, stderr io.Writer) (exitCode in
 
 func init() {
 	listCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
+	listCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	rootCmd.AddCommand(listCmd)
 }

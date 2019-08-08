@@ -11,20 +11,21 @@ func TestRunCheck(t *testing.T) {
 		name         string
 		warningCond  string
 		criticalCond string
+		pid          int32
 		wantExitCode int
 		wantStdout   string
 		wantStderr   string
 	}{
-		{"metr check -w 'cpu > 100' -c 'cpu > 100'", "cpu > 100", "cpu > 100", 0, "METR OK: w(cpu > 100) c(cpu > 100)", ""},
-		{"metr check -w 'cpu < 100' -c 'cpu > 100'", "cpu < 100", "cpu > 100", 1, "METR WARNING: w(cpu < 100) c(cpu > 100)", ""},
-		{"metr check -w 'cpu >= 0' -c 'cpu < 100'", "cpu >= 0", "cpu < 100", 2, "METR CRITICAL: w(cpu >= 0) c(cpu < 100)", ""},
-		{"metr check -w 'cpu >= 0'", "cpu >= 0", "", 1, "METR WARNING: w(cpu >= 0) c()", ""},
+		{"metr check -w 'cpu > 100' -c 'cpu > 100'", "cpu > 100", "cpu > 100", 0, 0, "METR OK: w(cpu > 100) c(cpu > 100)", ""},
+		{"metr check -w 'cpu < 100' -c 'cpu > 100'", "cpu < 100", "cpu > 100", 0, 1, "METR WARNING: w(cpu < 100) c(cpu > 100)", ""},
+		{"metr check -w 'cpu >= 0' -c 'cpu < 100'", "cpu >= 0", "cpu < 100", 0, 2, "METR CRITICAL: w(cpu >= 0) c(cpu < 100)", ""},
+		{"metr check -w 'cpu >= 0'", "cpu >= 0", "", 0, 1, "METR WARNING: w(cpu >= 0) c()", ""},
 	}
 
 	for _, tt := range tests {
 		stdout := new(bytes.Buffer)
 		stderr := new(bytes.Buffer)
-		exitCode := runCheck([]string{}, tt.warningCond, tt.criticalCond, 500, stdout, stderr)
+		exitCode := runCheck([]string{}, tt.warningCond, tt.criticalCond, 500, tt.pid, stdout, stderr)
 		_ = stdout.String()
 		if exitCode != tt.wantExitCode {
 			t.Errorf("runCheck([], %s, %s, 500, stdout, stderr) = %d, want = %d", tt.warningCond, tt.criticalCond, exitCode, tt.wantExitCode)

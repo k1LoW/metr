@@ -81,11 +81,11 @@ var checkCmd = &cobra.Command{
 	Short: "check metrics condition and output result with exit status code",
 	Long:  `check metrics condition and output result with exit status code.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCheck(args, warningCond, criticalCond, interval, os.Stdout, os.Stderr))
+		os.Exit(runCheck(args, warningCond, criticalCond, interval, pid, os.Stdout, os.Stderr))
 	},
 }
 
-func runCheck(args []string, warningCond, criticalCond string, interval int, stdout, stderr io.Writer) (exitCode int) {
+func runCheck(args []string, warningCond, criticalCond string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
 	r := &Result{
 		stdout: stdout,
 		stderr: stderr,
@@ -96,7 +96,7 @@ func runCheck(args []string, warningCond, criticalCond string, interval int, std
 	if warningCond == "" && criticalCond == "" {
 		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires -w or -c option"))
 	}
-	m, err := metrics.GetMetrics(time.Duration(interval) * time.Millisecond)
+	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
 	if err != nil {
 		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
 	}
@@ -127,4 +127,5 @@ func init() {
 	checkCmd.Flags().StringVarP(&warningCond, "warning", "w", "", "WARNING condition")
 	checkCmd.Flags().StringVarP(&criticalCond, "critical", "c", "", "CRITICAL condition")
 	checkCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
+	checkCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 }
