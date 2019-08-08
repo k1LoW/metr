@@ -55,7 +55,7 @@ brews:
 nfpms:
   -
     id: metr-nfpms
-    name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Arch }}"
     builds:
     - metr-linux
     homepage: https://github.com/k1LoW/metr
