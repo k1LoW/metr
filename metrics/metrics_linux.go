@@ -10,6 +10,7 @@ import (
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/process"
 )
 
 func AvailableMetrics() []Metric {
@@ -38,15 +39,61 @@ func AvailableMetrics() []Metric {
 	}
 }
 
+func AvailableProcMetrics() []Metric {
+	return []Metric{
+		{"proc_cpu", "Percentage of the CPU time the process uses.", "%f", "%"},
+		{"proc_mem", "Percentage of the total RAM the process uses.", "%f", "%"},
+		{"proc_rss", "Non-swapped physical memory the process uses (bytes).", "%d", "bytes"},
+		{"proc_vms", "Amount of virtual memory the process uses (bytes).", "%d", "bytes"},
+		{"proc_swap", "Amount of memory that has been swapped out to disk the process uses (bytes).", "%d", "bytes"},
+		{"proc_connections", "Amount of connections(TCP, UDP or UNIX) the process uses.", "%d", ""},
+		{"proc_open_files", "Amount of files and file discripters opend by the process.", "%d", ""},
+	}
+}
+
 func (m *Metrics) Collect() error {
 	wg := &sync.WaitGroup{}
 
 	// 2 = goroutine count
 	errChan := make(chan error, 2)
 
+	if m.procPID > 0 {
+		p, err := process.NewProcess(m.procPID)
+		if err != nil {
+			return err
+		}
+		cpuPercent, err := p.CPUPercent()
+		if err != nil {
+			return err
+		}
+		memPercent, err := p.MemoryPercent()
+		if err != nil {
+			return err
+		}
+		memInfo, err := p.MemoryInfo()
+		if err != nil {
+			return err
+		}
+		connections, err := p.Connections()
+		if err != nil {
+			return err
+		}
+		openFiles, err := p.OpenFiles()
+		if err != nil {
+			return err
+		}
+		m.Store("proc_cpu", cpuPercent)
+		m.Store("proc_mem", memPercent)
+		m.Store("proc_rss", memInfo.RSS)
+		m.Store("proc_vms", memInfo.VMS)
+		m.Store("proc_swap", memInfo.Swap)
+		m.Store("proc_connections", len(connections))
+		m.Store("proc_open_files", len(openFiles))
+	}
+
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
-		cpuPercent, err := cpu.Percent(m.interval, false)
+		cpuPercent, err := cpu.Percent(m.collectInterval, false)
 		if err != nil {
 			errChan <- err
 			return
@@ -76,7 +123,7 @@ func (m *Metrics) Collect() error {
 		}
 		beforeTotal := before[0].Total()
 
-		if m.interval == 0 {
+		if m.collectInterval == 0 {
 			m.Store("user", before[0].User/beforeTotal*100)
 			m.Store("system", before[0].System/beforeTotal*100)
 			m.Store("idle", before[0].Idle/beforeTotal*100)
@@ -90,7 +137,7 @@ func (m *Metrics) Collect() error {
 			return
 		}
 
-		time.Sleep(m.interval)
+		time.Sleep(m.collectInterval)
 
 		after, err := cpu.Times(false)
 		if err != nil {

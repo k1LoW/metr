@@ -28,7 +28,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var interval int
+var (
+	interval int
+	pid      int32
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{

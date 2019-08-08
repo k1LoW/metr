@@ -20,6 +20,7 @@ if condition match `exit 0` else `exit 1`, like `test` command.
 
 ``` console
 $ metr check -w 'cpu > 10 or mem > 50' -c 'cpu > 50 and mem > 90'
+METR WARNING: w(cpu > 10 or mem > 50) c(cpu > 50 and mem > 90)
 ```
 
 `metr check` is compatible with
