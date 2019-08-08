@@ -54,6 +54,15 @@ func (m *Metrics) Format(key string) string {
 // Raw returns raw metrics map
 func (m *Metrics) Raw() map[string]interface{} {
 	metrics := map[string]interface{}{}
+	// process metrics
+	for _, metric := range m.procMetrics {
+		if value, ok := m.Load(metric.Name); ok {
+			metrics[metric.Name] = value
+		} else {
+			metrics[metric.Name] = 0
+		}
+	}
+	// system metrics
 	for _, metric := range m.metrics {
 		if value, ok := m.Load(metric.Name); ok {
 			metrics[metric.Name] = value
