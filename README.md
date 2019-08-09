@@ -4,7 +4,7 @@
 
 ## Usage
 
-### `metr cond`
+### `metr cond` ( alias: `metr test` )
 
 ``` console
 $ metr cond 'cpu > 10 or mem > 90'

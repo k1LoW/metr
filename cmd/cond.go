@@ -49,6 +49,21 @@ var condCmd = &cobra.Command{
 	},
 }
 
+var testCmd = &cobra.Command{
+	Use:   "test [CONDITION]",
+	Short: "alias for cond",
+	Long:  `alias for cond.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return errors.WithStack(errors.New("metr requires one arg"))
+		}
+		return nil
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		os.Exit(runCond(args, interval, pid, os.Stdout, os.Stderr))
+	},
+}
+
 func runCond(args []string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
 	mcond := args[0]
 	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
@@ -71,5 +86,8 @@ func runCond(args []string, interval int, pid int32, stdout, stderr io.Writer) (
 func init() {
 	condCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	condCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
+	testCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
+	testCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	rootCmd.AddCommand(condCmd)
+	rootCmd.AddCommand(testCmd)
 }
