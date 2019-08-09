@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.5.1](https://github.com/k1LoW/metr/compare/v0.5.0...v0.5.1) (2019-08-10)
+
+* Add `metr test` command that alias for `metr cond` [#16](https://github.com/k1LoW/metr/pull/16) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.5.0](https://github.com/k1LoW/metr/compare/v0.4.0...v0.5.0) (2019-08-08)
 
 * Add `--pid` option for process metrics [#15](https://github.com/k1LoW/metr/pull/15) ([k1LoW](https://github.com/k1LoW))
