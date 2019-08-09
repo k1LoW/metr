@@ -1,6 +1,6 @@
 # metr [![Build Status](https://travis-ci.org/k1LoW/metr.svg?branch=master)](https://travis-ci.org/k1LoW/metr) [![GitHub release](https://img.shields.io/github/release/k1LoW/metr.svg)](https://github.com/k1LoW/metr/releases)
 
-`metr` provides an easy way to use system **metr**ics for shell script/monitoring tool.
+`metr` provides an easy way to use system/process **metr**ics for shell script/monitoring tool.
 
 ## Usage
 

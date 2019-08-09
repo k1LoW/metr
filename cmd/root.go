@@ -36,8 +36,8 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "metr",
-	Short: "'metr' provides an easy way to use system metrics for shell script/monitoring tool",
-	Long:  `'metr' provides an easy way to use system metrics for shell script/monitoring tool.`,
+	Short: "'metr' provides an easy way to use system/process metrics for shell script/monitoring tool",
+	Long:  `'metr' provides an easy way to use system/process metrics for shell script/monitoring tool.`,
 }
 
 func Execute() {
