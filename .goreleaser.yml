@@ -60,7 +60,7 @@ nfpms:
     - metr-linux
     homepage: https://github.com/k1LoW/metr
     maintainer: Ken'ichiro Oyama <k1lowxb@gmail.com>
-    description: "'metr' provides an easy way to use system/process metrics for shell script/monitoring tool."
+    description: "'metr' provides an easy way to use host/process metrics for shell script/monitoring tool."
     license: MIT
     formats:
       - deb

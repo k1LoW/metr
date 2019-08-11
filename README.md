@@ -1,6 +1,6 @@
 # metr [![Build Status](https://travis-ci.org/k1LoW/metr.svg?branch=master)](https://travis-ci.org/k1LoW/metr) [![GitHub release](https://img.shields.io/github/release/k1LoW/metr.svg)](https://github.com/k1LoW/metr/releases)
 
-`metr` provides an easy way to use system/process **metr**ics for shell script/monitoring tool.
+`metr` provides an easy way to use host/process **metr**ics for shell script/monitoring tool.
 
 ## Usage
 
@@ -27,6 +27,7 @@ METR WARNING: w(cpu > 10 or mem > 50) c(cpu > 50 and mem > 90)
 
 - Nagios plugin
 - Mackerel check plugin `command`
+- Consul check `command`
 - Sensu checks
 
 | Exit status code | Meaning  |
