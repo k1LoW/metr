@@ -48,47 +48,19 @@ func AvailableProcMetrics() []Metric {
 		{"proc_swap", "Amount of memory that has been swapped out to disk the process uses (bytes).", "%d", "bytes"},
 		{"proc_connections", "Amount of connections(TCP, UDP or UNIX) the process uses.", "%d", ""},
 		{"proc_open_files", "Amount of files and file discripters opend by the process.", "%d", ""},
+		{"proc_count", "Number of the processes.", "%d", ""},
 	}
 }
 
 func (m *Metrics) Collect() error {
 	wg := &sync.WaitGroup{}
 
-	// 2 = goroutine count
-	errChan := make(chan error, 2)
+	// 3 = goroutine count
+	errChan := make(chan error, 3)
 
-	if m.procPID > 0 {
-		p, err := process.NewProcess(m.procPID)
-		if err != nil {
-			return err
-		}
-		cpuPercent, err := p.CPUPercent()
-		if err != nil {
-			return err
-		}
-		memPercent, err := p.MemoryPercent()
-		if err != nil {
-			return err
-		}
-		memInfo, err := p.MemoryInfo()
-		if err != nil {
-			return err
-		}
-		connections, err := p.Connections()
-		if err != nil {
-			return err
-		}
-		openFiles, err := p.OpenFiles()
-		if err != nil {
-			return err
-		}
-		m.Store("proc_cpu", cpuPercent)
-		m.Store("proc_mem", memPercent)
-		m.Store("proc_rss", memInfo.RSS)
-		m.Store("proc_vms", memInfo.VMS)
-		m.Store("proc_swap", memInfo.Swap)
-		m.Store("proc_connections", len(connections))
-		m.Store("proc_open_files", len(openFiles))
+	if len(m.procPIDs) > 0 {
+		wg.Add(1)
+		go m.collectProc(wg)
 	}
 
 	wg.Add(1)
@@ -192,4 +164,73 @@ func (m *Metrics) Collect() error {
 	}
 
 	return nil
+}
+
+func (m *Metrics) collectProc(wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	procWg := &sync.WaitGroup{}
+	mutex := &sync.Mutex{}
+
+	cpuPercentTotal := float64(0)
+	memPercentTotal := float32(0)
+	memRSSTotal := uint64(0)
+	memVMSTotal := uint64(0)
+	memSwapTotal := uint64(0)
+	connectionTotal := 0
+	openFileTotal := 0
+	processCount := 0
+
+	for _, pid := range m.procPIDs {
+		procWg.Add(1)
+		go func(pid int32, procWg *sync.WaitGroup, mutex *sync.Mutex) {
+			defer procWg.Done()
+			p, err := process.NewProcess(pid)
+			if err != nil {
+				return
+			}
+			cpuPercent, err := p.CPUPercent()
+			if err != nil {
+				return
+			}
+			memPercent, err := p.MemoryPercent()
+			if err != nil {
+				return
+			}
+			memInfo, err := p.MemoryInfo()
+			if err != nil {
+				return
+			}
+			connections, err := p.Connections()
+			if err != nil {
+				return
+			}
+			openFiles, err := p.OpenFiles()
+			if err != nil {
+				return
+			}
+			mutex.Lock()
+
+			cpuPercentTotal = cpuPercentTotal + cpuPercent
+			memPercentTotal = memPercentTotal + memPercent
+			memRSSTotal = memRSSTotal + memInfo.RSS
+			memVMSTotal = memVMSTotal + memInfo.VMS
+			memSwapTotal = memSwapTotal + memInfo.Swap
+			connectionTotal = connectionTotal + len(connections)
+			openFileTotal = openFileTotal + len(openFiles)
+			processCount = processCount + 1
+
+			mutex.Unlock()
+		}(pid, procWg, mutex)
+	}
+	procWg.Wait()
+
+	m.Store("proc_cpu", cpuPercentTotal)
+	m.Store("proc_mem", memPercentTotal)
+	m.Store("proc_rss", memRSSTotal)
+	m.Store("proc_vms", memVMSTotal)
+	m.Store("proc_swap", memSwapTotal)
+	m.Store("proc_connections", connectionTotal)
+	m.Store("proc_open_files", openFileTotal)
+	m.Store("proc_count", processCount)
 }
