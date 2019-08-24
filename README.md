@@ -52,7 +52,7 @@ load1:1.310000
 load5:1.410000
 load15:1.550000
 numcpu:8
-$ metr get all -p `pgrep -n docker`
+$ metr get all -P docker
 proc_cpu:0.079323
 proc_mem:0.230384
 proc_rss:39579648
@@ -97,6 +97,7 @@ proc_rss (now:217280512 bytes): Non-swapped physical memory the process uses (by
 proc_vms (now:7010299904 bytes): Amount of virtual memory the process uses (bytes).
 proc_swap (now:0 bytes): Amount of memory that has been swapped out to disk the process uses (bytes).
 proc_connections (now:0 ): Amount of connections(TCP, UDP or UNIX) the process uses.
+proc_count (now:1 ): Number of the processes.
 cpu (now:22.000000 %): Percentage of cpu used.
 mem (now:59.768772 %): Percentage of RAM used.
 swap (now:781451264 bytes): Amount of memory that has been swapped out to disk (bytes).
