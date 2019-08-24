@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.6.0](https://github.com/k1LoW/metr/compare/v0.5.1...v0.6.0) (2019-08-24)
+
+* Add `--name` option for process metrics [#18](https://github.com/k1LoW/metr/pull/18) ([k1LoW](https://github.com/k1LoW))
+* metr/metrics support collecting multi processes metrics (use total) [#17](https://github.com/k1LoW/metr/pull/17) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.5.1](https://github.com/k1LoW/metr/compare/v0.5.0...v0.5.1) (2019-08-10)
 
 * Add `metr test` command that alias for `metr cond` [#16](https://github.com/k1LoW/metr/pull/16) ([k1LoW](https://github.com/k1LoW))
