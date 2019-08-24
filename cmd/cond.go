@@ -42,10 +42,13 @@ var condCmd = &cobra.Command{
 		if len(args) != 1 {
 			return errors.WithStack(errors.New("metr requires one arg"))
 		}
+		if pid > 0 && name != "" {
+			return errors.WithStack(errors.New("target option can only be either --pid or --name"))
+		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCond(args, interval, pid, os.Stdout, os.Stderr))
+		os.Exit(runCond(args, interval, pid, name, os.Stdout, os.Stderr))
 	},
 }
 
@@ -60,16 +63,29 @@ var testCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCond(args, interval, pid, os.Stdout, os.Stderr))
+		os.Exit(runCond(args, interval, pid, name, os.Stdout, os.Stderr))
 	},
 }
 
-func runCond(args []string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
+func runCond(args []string, interval int, pid int32, name string, stdout, stderr io.Writer) (exitCode int) {
 	mcond := args[0]
-	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
-	if err != nil {
-		_, _ = fmt.Fprintf(stderr, "%s\n", err)
-		return 1
+	var (
+		m   *metrics.Metrics
+		err error
+	)
+	switch {
+	case name != "":
+		m, err = metrics.GetMetricsUsingName(time.Duration(interval)*time.Millisecond, name)
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "%s\n", err)
+			return 1
+		}
+	default:
+		m, err = metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "%s\n", err)
+			return 1
+		}
 	}
 	got, err := expr.Eval(fmt.Sprintf("(%s) == true", mcond), m.Raw())
 	if err != nil {
@@ -88,6 +104,7 @@ func init() {
 	condCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	testCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	testCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
+	testCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
 	rootCmd.AddCommand(condCmd)
 	rootCmd.AddCommand(testCmd)
 }

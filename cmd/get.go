@@ -41,20 +41,35 @@ var getCmd = &cobra.Command{
 		if len(args) != 1 {
 			return errors.WithStack(errors.New("metr requires one arg"))
 		}
+		if pid > 0 && name != "" {
+			return errors.WithStack(errors.New("target option can only be either --pid or --name"))
+		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runGet(args, interval, pid, os.Stdout, os.Stderr))
+		os.Exit(runGet(args, interval, pid, name, os.Stdout, os.Stderr))
 	},
 }
 
-func runGet(args []string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
+func runGet(args []string, interval int, pid int32, name string, stdout, stderr io.Writer) (exitCode int) {
 	key := args[0]
-
-	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
-	if err != nil {
-		_, _ = fmt.Fprintf(stderr, "%s\n", err)
-		return 1
+	var (
+		m   *metrics.Metrics
+		err error
+	)
+	switch {
+	case name != "":
+		m, err = metrics.GetMetricsUsingName(time.Duration(interval)*time.Millisecond, name)
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "%s\n", err)
+			return 1
+		}
+	default:
+		m, err = metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "%s\n", err)
+			return 1
+		}
 	}
 	if len(args) == 1 && key == "all" {
 		m.Each(func(metric metrics.Metric, v interface{}) {
@@ -74,5 +89,6 @@ func runGet(args []string, interval int, pid int32, stdout, stderr io.Writer) (e
 func init() {
 	getCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	getCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
+	getCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
 	rootCmd.AddCommand(getCmd)
 }

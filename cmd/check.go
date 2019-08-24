@@ -80,12 +80,18 @@ var checkCmd = &cobra.Command{
 	Use:   "check -w [WARNING_CONDITION] -c [CRITICAL_CONDITION]",
 	Short: "check metrics condition and output result with exit status code",
 	Long:  `check metrics condition and output result with exit status code.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if pid > 0 && name != "" {
+			return errors.WithStack(errors.New("target option can only be either --pid or --name"))
+		}
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCheck(args, warningCond, criticalCond, interval, pid, os.Stdout, os.Stderr))
+		os.Exit(runCheck(args, warningCond, criticalCond, interval, pid, name, os.Stdout, os.Stderr))
 	},
 }
 
-func runCheck(args []string, warningCond, criticalCond string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
+func runCheck(args []string, warningCond, criticalCond string, interval int, pid int32, name string, stdout, stderr io.Writer) (exitCode int) {
 	r := &Result{
 		stdout: stdout,
 		stderr: stderr,
@@ -96,9 +102,21 @@ func runCheck(args []string, warningCond, criticalCond string, interval int, pid
 	if warningCond == "" && criticalCond == "" {
 		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires -w or -c option"))
 	}
-	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
-	if err != nil {
-		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+	var (
+		m   *metrics.Metrics
+		err error
+	)
+	switch {
+	case name != "":
+		m, err = metrics.GetMetricsUsingName(time.Duration(interval)*time.Millisecond, name)
+		if err != nil {
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+		}
+	default:
+		m, err = metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
+		if err != nil {
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+		}
 	}
 	if criticalCond != "" {
 		got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m.Raw())
@@ -128,4 +146,5 @@ func init() {
 	checkCmd.Flags().StringVarP(&criticalCond, "critical", "c", "", "CRITICAL condition")
 	checkCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	checkCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
+	checkCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
 }
