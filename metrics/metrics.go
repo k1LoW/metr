@@ -4,6 +4,8 @@ import (
 	"errors"
 	"sync"
 	"time"
+
+	"github.com/shirou/gopsutil/process"
 )
 
 type Metric struct {
@@ -110,4 +112,23 @@ func GetMetrics(interval time.Duration, pids ...int32) (*Metrics, error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+// GetMetricsUsingName returns metrics
+func GetMetricsUsingName(interval time.Duration, name string) (*Metrics, error) {
+	processes, err := process.Processes()
+	if err != nil {
+		return nil, err
+	}
+	pids := []int32{}
+	for _, p := range processes {
+		pname, err := p.Name()
+		if err != nil {
+			continue
+		}
+		if pname == name {
+			pids = append(pids, p.Pid)
+		}
+	}
+	return GetMetrics(interval, pids...)
 }

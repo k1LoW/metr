@@ -31,6 +31,7 @@ import (
 var (
 	interval int
 	pid      int32
+	name     string
 )
 
 // rootCmd represents the base command when called without any subcommands

@@ -42,18 +42,34 @@ var listCmd = &cobra.Command{
 		if len(args) > 0 {
 			return errors.WithStack(errors.New("metr requires no args"))
 		}
+		if pid > 0 && name != "" {
+			return errors.WithStack(errors.New("target option can only be either --pid or --name"))
+		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runList(args, interval, pid, os.Stdout, os.Stderr))
+		os.Exit(runList(args, interval, pid, name, os.Stdout, os.Stderr))
 	},
 }
 
-func runList(args []string, interval int, pid int32, stdout, stderr io.Writer) (exitCode int) {
-	m, err := metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
-	if err != nil {
-		_, _ = fmt.Fprintf(stderr, "%s\n", err)
-		return 1
+func runList(args []string, interval int, pid int32, name string, stdout, stderr io.Writer) (exitCode int) {
+	var (
+		m   *metrics.Metrics
+		err error
+	)
+	switch {
+	case name != "":
+		m, err = metrics.GetMetricsUsingName(time.Duration(interval)*time.Millisecond, name)
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "%s\n", err)
+			return 1
+		}
+	default:
+		m, err = metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
+		if err != nil {
+			_, _ = fmt.Fprintf(stderr, "%s\n", err)
+			return 1
+		}
 	}
 	m.Each(func(metric metrics.Metric, value interface{}) {
 		_, _ = fmt.Fprintf(stdout, "%s (now:%v %s): %v\n", color.White(metric.Name, color.B), color.Cyan(fmt.Sprintf(metric.Format, value)), metric.Unit, metric.Description)
@@ -65,5 +81,6 @@ func runList(args []string, interval int, pid int32, stdout, stderr io.Writer) (
 func init() {
 	listCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	listCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
+	listCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
 	rootCmd.AddCommand(listCmd)
 }
