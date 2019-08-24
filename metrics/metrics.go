@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"errors"
-	"reflect"
 	"sync"
 	"time"
 )
@@ -100,7 +99,7 @@ func (m *Metrics) Each(f func(metric Metric, value interface{})) {
 // GetMetrics returns metrics
 func GetMetrics(interval time.Duration, pids ...int32) (*Metrics, error) {
 	m := NewMetrics(interval)
-	if len(pids) > 0 && !reflect.DeepEqual(pids, []int32{0}) {
+	if len(pids) > 0 && !(len(pids) == 1 && pids[0] == 0) {
 		err := m.SetProcPIDs(pids)
 		if err != nil {
 			return nil, err
