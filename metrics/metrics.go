@@ -18,7 +18,7 @@ type Metrics struct {
 	sync.Map
 	collectInterval time.Duration
 	metrics         []Metric
-	procPID         int32
+	procPIDs        []int32
 	procMetrics     []Metric
 }
 
@@ -31,14 +31,17 @@ func NewMetrics(interval time.Duration) *Metrics {
 	return m
 }
 
-func (m *Metrics) SetProcPID(pid int32) error {
-	if pid <= 0 {
-		return errors.New("PID should be >= 0")
+func (m *Metrics) SetProcPIDs(pids []int32) error {
+	for _, pid := range pids {
+		if pid <= 0 {
+			return errors.New("PID should be >= 0")
+		}
+		m.procPIDs = append(m.procPIDs, pid)
 	}
-	m.procPID = pid
-	if pid > 0 {
+	if len(pids) > 0 {
 		m.procMetrics = AvailableProcMetrics()
 	}
+
 	return nil
 }
 
@@ -94,10 +97,10 @@ func (m *Metrics) Each(f func(metric Metric, value interface{})) {
 }
 
 // GetMetrics returns metrics
-func GetMetrics(interval time.Duration, pid int32) (*Metrics, error) {
+func GetMetrics(interval time.Duration, pids ...int32) (*Metrics, error) {
 	m := NewMetrics(interval)
-	if pid > 0 {
-		err := m.SetProcPID(pid)
+	if len(pids) > 0 && !(len(pids) == 1 && pids[0] == 0) {
+		err := m.SetProcPIDs(pids)
 		if err != nil {
 			return nil, err
 		}
