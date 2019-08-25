@@ -9,10 +9,11 @@ import (
 )
 
 type Metric struct {
-	Name        string
-	Description string
-	Format      string
-	Unit        string
+	Name         string
+	Description  string
+	Format       string
+	Unit         string
+	InitialValue interface{}
 }
 
 // Metrics struct
@@ -28,9 +29,23 @@ type Metrics struct {
 func NewMetrics(interval time.Duration) *Metrics {
 	m := &Metrics{
 		collectInterval: interval,
-		metrics:         AvailableMetrics(),
 	}
+	m.InitializeMetrics()
 	return m
+}
+
+func (m *Metrics) InitializeMetrics() {
+	m.metrics = AvailableMetrics()
+	for _, metric := range m.metrics {
+		m.Store(metric.Name, metric.InitialValue)
+	}
+}
+
+func (m *Metrics) InitializeProcMetrics() {
+	m.procMetrics = AvailableProcMetrics()
+	for _, metric := range m.procMetrics {
+		m.Store(metric.Name, metric.InitialValue)
+	}
 }
 
 func (m *Metrics) SetProcPIDs(pids []int32) error {
@@ -39,9 +54,6 @@ func (m *Metrics) SetProcPIDs(pids []int32) error {
 			return errors.New("PID should be >= 0")
 		}
 		m.procPIDs = append(m.procPIDs, pid)
-	}
-	if len(pids) > 0 {
-		m.procMetrics = AvailableProcMetrics()
 	}
 
 	return nil
@@ -100,13 +112,10 @@ func (m *Metrics) Each(f func(metric Metric, value interface{})) {
 
 // GetMetrics returns metrics
 func GetMetrics(interval time.Duration, pids ...int32) (*Metrics, error) {
-	m := NewMetrics(interval)
 	if len(pids) > 0 && !(len(pids) == 1 && pids[0] == 0) {
-		err := m.SetProcPIDs(pids)
-		if err != nil {
-			return nil, err
-		}
+		return GetMetricsByPIDs(interval, pids)
 	}
+	m := NewMetrics(interval)
 	err := m.Collect()
 	if err != nil {
 		return nil, err
@@ -114,8 +123,32 @@ func GetMetrics(interval time.Duration, pids ...int32) (*Metrics, error) {
 	return m, nil
 }
 
-// GetMetricsUsingName returns metrics
-func GetMetricsUsingName(interval time.Duration, name string) (*Metrics, error) {
+// GetMetricsByPIDs returns metrics
+func GetMetricsByPIDs(interval time.Duration, pids []int32) (*Metrics, error) {
+	if len(pids) == 0 {
+		return nil, errors.New("empty pids")
+	}
+	m := NewMetrics(interval)
+	m.InitializeProcMetrics()
+	err := m.SetProcPIDs(pids)
+	if err != nil {
+		return nil, err
+	}
+	err = m.Collect()
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// GetMetricsByName returns metrics
+func GetMetricsByName(interval time.Duration, name string) (*Metrics, error) {
+	if name == "" {
+		return nil, errors.New("empty name")
+	}
+	m := NewMetrics(interval)
+	m.InitializeProcMetrics()
+
 	processes, err := process.Processes()
 	if err != nil {
 		return nil, err
@@ -130,5 +163,14 @@ func GetMetricsUsingName(interval time.Duration, name string) (*Metrics, error) 
 			pids = append(pids, p.Pid)
 		}
 	}
-	return GetMetrics(interval, pids...)
+	err = m.SetProcPIDs(pids)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.Collect()
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
 }

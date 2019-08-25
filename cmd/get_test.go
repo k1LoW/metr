@@ -23,8 +23,12 @@ func TestRunGet(t *testing.T) {
 		{"metr get all", []string{"all"}, 0, "", 0, regexp.MustCompile(`user:\d+\.\d+\n`), ""},
 		{"metr get proc_cpu", []string{"proc_cpu"}, 0, "", 1, regexp.MustCompile(`^$`), "proc_cpu does not exist"},
 		{"metr get proc_cpu -p $PID", []string{"proc_cpu"}, int32(os.Getpid()), "", 0, regexp.MustCompile(`^\d+\.\d+$`), ""},
-		{"metr get all -p $PID`", []string{"all"}, int32(os.Getpid()), "", 0, regexp.MustCompile(`proc_cpu:\d+\.\d+\n`), ""},
+		{"metr get all -p $PID", []string{"all"}, int32(os.Getpid()), "", 0, regexp.MustCompile(`proc_cpu:\d+\.\d+\n`), ""},
+		{"metr get all -p 999999", []string{"all"}, 999999, "", 0, regexp.MustCompile(`proc_cpu:\d+\.\d+\n`), ""},
+		{"metr get all -p 999999", []string{"all"}, 999999, "", 0, regexp.MustCompile(`proc_count:0\n`), ""},
 		{"metr get all -P [Name of target process]", []string{"all"}, 0, "go", 0, regexp.MustCompile(`proc_cpu:\d+\.\d+\n`), ""},
+		{"metr get all -p non-exist", []string{"all"}, 0, "non-exist", 0, regexp.MustCompile(`proc_cpu:\d+\.\d+\n`), ""},
+		{"metr get all -p non-exist", []string{"all"}, 0, "non-exist", 0, regexp.MustCompile(`proc_count:0\n`), ""},
 	}
 
 	for _, tt := range tests {

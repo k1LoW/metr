@@ -15,32 +15,33 @@ import (
 
 func AvailableMetrics() []Metric {
 	return []Metric{
-		{"cpu", "Percentage of cpu used.", "%f", "%"},
-		{"mem", "Percentage of RAM used.", "%f", "%"},
-		{"swap", "Amount of memory that has been swapped out to disk (bytes).", "%d", "bytes"},
+		{"cpu", "Percentage of cpu used.", "%f", "%", float64(0)},
+		{"mem", "Percentage of RAM used.", "%f", "%", float64(0)},
+		{"swap", "Amount of memory that has been swapped out to disk (bytes).", "%d", "bytes", uint64(0)},
 
-		{"user", "Percentage of CPU utilization that occurred while executing at the user level.", "%f", "%"},
-		{"system", "Percentage of CPU utilization that occurred while executing at the system level.", "%f", "%"},
-		{"idle", "Percentage of time that CPUs were idle and the system did not have an outstanding disk I/O request.", "%f", "%"},
-		{"nice", "Percentage of CPU utilization that occurred while executing at the user level with nice priority.", "%f", "%"},
+		{"user", "Percentage of CPU utilization that occurred while executing at the user level.", "%f", "%", float64(0)},
+		{"system", "Percentage of CPU utilization that occurred while executing at the system level.", "%f", "%", float64(0)},
+		{"idle", "Percentage of time that CPUs were idle and the system did not have an outstanding disk I/O request.", "%f", "%", float64(0)},
+		{"nice", "Percentage of CPU utilization that occurred while executing at the user level with nice priority.", "%f", "%", float64(0)},
 
-		{"load1", "Load avarage for 1 minute.", "%f", ""},
-		{"load5", "Load avarage for 5 minutes.", "%f", ""},
-		{"load15", "Load avarage for 15 minutes.", "%f", ""},
+		{"load1", "Load avarage for 1 minute.", "%f", "", float64(0)},
+		{"load5", "Load avarage for 5 minutes.", "%f", "", float64(0)},
+		{"load15", "Load avarage for 15 minutes.", "%f", "", float64(0)},
 
-		{"numcpu", "Number of logical CPUs.", "%d", ""},
+		{"numcpu", "Number of logical CPUs.", "%d", "", int(0)},
 	}
 }
 
 func AvailableProcMetrics() []Metric {
 	return []Metric{
-		{"proc_cpu", "Percentage of the CPU time the process uses.", "%f", "%"},
-		{"proc_mem", "Percentage of the total RAM the process uses.", "%f", "%"},
-		{"proc_rss", "Non-swapped physical memory the process uses (bytes).", "%d", "bytes"},
-		{"proc_vms", "Amount of virtual memory the process uses (bytes).", "%d", "bytes"},
-		{"proc_swap", "Amount of memory that has been swapped out to disk the process uses (bytes).", "%d", "bytes"},
-		{"proc_connections", "Amount of connections(TCP, UDP or UNIX) the process uses.", "%d", ""},
-		{"proc_count", "Number of the processes.", "%d", ""},
+		{"proc_cpu", "Percentage of the CPU time the process uses.", "%f", "%", float64(0)},
+		{"proc_mem", "Percentage of the total RAM the process uses.", "%f", "%", float32(0)},
+		{"proc_rss", "Non-swapped physical memory the process uses (bytes).", "%d", "bytes", uint64(0)},
+		{"proc_vms", "Amount of virtual memory the process uses (bytes).", "%d", "bytes", uint64(0)},
+		{"proc_swap", "Amount of memory that has been swapped out to disk the process uses (bytes).", "%d", "bytes", uint64(0)},
+		{"proc_connections", "Amount of connections(TCP, UDP or UNIX) the process uses.", "%d", "", int(0)},
+
+		{"proc_count", "Number of the processes.", "%d", "", int(0)},
 	}
 }
 
