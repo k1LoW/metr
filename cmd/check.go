@@ -108,7 +108,7 @@ func runCheck(args []string, warningCond, criticalCond string, interval int, pid
 	)
 	switch {
 	case name != "":
-		m, err = metrics.GetMetricsUsingName(time.Duration(interval)*time.Millisecond, name)
+		m, err = metrics.GetMetricsByName(time.Duration(interval)*time.Millisecond, name)
 		if err != nil {
 			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
 		}

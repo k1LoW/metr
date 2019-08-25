@@ -59,7 +59,7 @@ func runGet(args []string, interval int, pid int32, name string, stdout, stderr 
 	)
 	switch {
 	case name != "":
-		m, err = metrics.GetMetricsUsingName(time.Duration(interval)*time.Millisecond, name)
+		m, err = metrics.GetMetricsByName(time.Duration(interval)*time.Millisecond, name)
 		if err != nil {
 			_, _ = fmt.Fprintf(stderr, "%s\n", err)
 			return 1
