@@ -40,6 +40,7 @@ func AvailableProcMetrics() []Metric {
 		{"proc_vms", "Amount of virtual memory the process uses (bytes).", "%d", "bytes", uint64(0)},
 		{"proc_swap", "Amount of memory that has been swapped out to disk the process uses (bytes).", "%d", "bytes", uint64(0)},
 		{"proc_connections", "Amount of connections(TCP, UDP or UNIX) the process uses.", "%d", "", int(0)},
+
 		{"proc_count", "Number of the processes.", "%d", "", int(0)},
 	}
 }
