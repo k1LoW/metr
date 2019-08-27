@@ -3,7 +3,9 @@
 package metrics
 
 import (
+	"os"
 	"runtime"
+	"strconv"
 	"sync"
 	"time"
 
@@ -46,7 +48,6 @@ func AvailableProcMetrics() []Metric {
 		{"proc_rss", "Non-swapped physical memory the process uses (bytes).", "%d", "bytes", uint64(0)},
 		{"proc_vms", "Amount of virtual memory the process uses (bytes).", "%d", "bytes", uint64(0)},
 		{"proc_swap", "Amount of memory that has been swapped out to disk the process uses (bytes).", "%d", "bytes", uint64(0)},
-		{"proc_connections", "Amount of connections(TCP, UDP or UNIX) the process uses.", "%d", "", int(0)},
 		{"proc_open_files", "Amount of files and file discripters opend by the process.", "%d", "", int(0)},
 
 		{"proc_count", "Number of the processes.", "%d", "", int(0)},
@@ -178,8 +179,8 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 	memRSSTotal := uint64(0)
 	memVMSTotal := uint64(0)
 	memSwapTotal := uint64(0)
-	connectionTotal := 0
-	openFileTotal := 0
+
+	openFilesAll := []string{}
 	processCount := 0
 
 	for _, pid := range m.procPIDs {
@@ -202,11 +203,7 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 			if err != nil {
 				return
 			}
-			connections, err := p.Connections()
-			if err != nil {
-				return
-			}
-			openFiles, err := p.OpenFiles()
+			files, err := openFiles(pid)
 			if err != nil {
 				return
 			}
@@ -217,8 +214,7 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 			memRSSTotal = memRSSTotal + memInfo.RSS
 			memVMSTotal = memVMSTotal + memInfo.VMS
 			memSwapTotal = memSwapTotal + memInfo.Swap
-			connectionTotal = connectionTotal + len(connections)
-			openFileTotal = openFileTotal + len(openFiles)
+			openFilesAll = append(openFilesAll, files...)
 			processCount = processCount + 1
 
 			mutex.Unlock()
@@ -231,7 +227,32 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 	m.Store("proc_rss", memRSSTotal)
 	m.Store("proc_vms", memVMSTotal)
 	m.Store("proc_swap", memSwapTotal)
-	m.Store("proc_connections", connectionTotal)
-	m.Store("proc_open_files", openFileTotal)
+	m.Store("proc_open_files", len(uniqueSlice(openFilesAll)))
+
 	m.Store("proc_count", processCount)
+}
+
+// openFiles
+// reference https://github.com/shirou/gopsutil/blob/2f74cb51781d173ae257a61e955594064ab6f7b0/process/process_linux.go#L781-L788
+func openFiles(pid int32) ([]string, error) {
+	fdPath := hostProc(strconv.Itoa(int(pid)), "fd")
+	d, err := os.Open(fdPath)
+	if err != nil {
+		return nil, err
+	}
+	defer d.Close()
+	fnames, err := d.Readdirnames(-1)
+	return fnames, err
+}
+
+func uniqueSlice(in []string) []string {
+	results := make([]string, 0, len(in))
+	encountered := map[string]bool{}
+	for i := 0; i < len(in); i++ {
+		if !encountered[in[i]] {
+			encountered[in[i]] = true
+			results = append(results, in[i])
+		}
+	}
+	return results
 }

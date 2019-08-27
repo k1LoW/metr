@@ -39,7 +39,6 @@ func AvailableProcMetrics() []Metric {
 		{"proc_rss", "Non-swapped physical memory the process uses (bytes).", "%d", "bytes", uint64(0)},
 		{"proc_vms", "Amount of virtual memory the process uses (bytes).", "%d", "bytes", uint64(0)},
 		{"proc_swap", "Amount of memory that has been swapped out to disk the process uses (bytes).", "%d", "bytes", uint64(0)},
-		{"proc_connections", "Amount of connections(TCP, UDP or UNIX) the process uses.", "%d", "", int(0)},
 
 		{"proc_count", "Number of the processes.", "%d", "", int(0)},
 	}
@@ -152,7 +151,6 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 	memRSSTotal := uint64(0)
 	memVMSTotal := uint64(0)
 	memSwapTotal := uint64(0)
-	connectionTotal := 0
 	processCount := 0
 
 	for _, pid := range m.procPIDs {
@@ -175,10 +173,6 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 			if err != nil {
 				return
 			}
-			connections, err := p.Connections()
-			if err != nil {
-				return
-			}
 			mutex.Lock()
 
 			cpuPercentTotal = cpuPercentTotal + cpuPercent
@@ -186,7 +180,6 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 			memRSSTotal = memRSSTotal + memInfo.RSS
 			memVMSTotal = memVMSTotal + memInfo.VMS
 			memSwapTotal = memSwapTotal + memInfo.Swap
-			connectionTotal = connectionTotal + len(connections)
 			processCount = processCount + 1
 
 			mutex.Unlock()
@@ -199,6 +192,5 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 	m.Store("proc_rss", memRSSTotal)
 	m.Store("proc_vms", memVMSTotal)
 	m.Store("proc_swap", memSwapTotal)
-	m.Store("proc_connections", connectionTotal)
 	m.Store("proc_count", processCount)
 }
