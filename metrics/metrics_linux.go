@@ -4,6 +4,7 @@ package metrics
 
 import (
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"sync"
@@ -243,6 +244,25 @@ func openFiles(pid int32) ([]string, error) {
 	defer d.Close()
 	fnames, err := d.Readdirnames(-1)
 	return fnames, err
+}
+
+// copy from gopsutil/internal/common
+func hostProc(combineWith ...string) string {
+	value := os.Getenv("HOST_PROC")
+	if value == "" {
+		value = "/proc"
+	}
+	switch len(combineWith) {
+	case 0:
+		return value
+	case 1:
+		return filepath.Join(value, combineWith[0])
+	default:
+		all := make([]string, len(combineWith)+1)
+		all[0] = value
+		copy(all[1:], combineWith)
+		return filepath.Join(all...)
+	}
 }
 
 func uniqueSlice(in []string) []string {
