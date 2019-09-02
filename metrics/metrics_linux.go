@@ -237,7 +237,7 @@ func (m *Metrics) collectProc(wg *sync.WaitGroup) {
 // reference https://github.com/shirou/gopsutil/blob/2f74cb51781d173ae257a61e955594064ab6f7b0/process/process_linux.go#L781-L788
 func openFiles(pid int32) ([]string, error) {
 	fdPath := hostProc(strconv.Itoa(int(pid)), "fd")
-	d, err := os.Open(fdPath)
+	d, err := os.Open(filepath.Clean(fdPath))
 	if err != nil {
 		return nil, err
 	}
