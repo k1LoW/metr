@@ -96,7 +96,6 @@ proc_mem (now:1.264739 %): Percentage of the total RAM the process uses.
 proc_rss (now:217280512 bytes): Non-swapped physical memory the process uses (bytes).
 proc_vms (now:7010299904 bytes): Amount of virtual memory the process uses (bytes).
 proc_swap (now:0 bytes): Amount of memory that has been swapped out to disk the process uses (bytes).
-proc_connections (now:0 ): Amount of connections(TCP, UDP or UNIX) the process uses.
 proc_count (now:1 ): Number of the processes.
 cpu (now:22.000000 %): Percentage of cpu used.
 mem (now:59.768772 %): Percentage of RAM used.
