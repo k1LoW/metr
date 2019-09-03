@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.8.0](https://github.com/k1LoW/metr/compare/v0.7.0...v0.8.0) (2019-09-02)
+
+* [BREAKING] Remove `proc_connections` / Fix `proc_open_files` counting logic [#20](https://github.com/k1LoW/metr/pull/20) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.7.0](https://github.com/k1LoW/metr/compare/v0.6.0...v0.7.0) (2019-08-26)
 
 * [BREAKING] Show metrics `proc_*` even if no process exists. [#19](https://github.com/k1LoW/metr/pull/19) ([k1LoW](https://github.com/k1LoW))
