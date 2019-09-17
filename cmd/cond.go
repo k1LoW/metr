@@ -102,6 +102,7 @@ func runCond(args []string, interval int, pid int32, name string, stdout, stderr
 func init() {
 	condCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	condCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
+	condCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
 	testCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	testCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	testCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
