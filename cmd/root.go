@@ -32,6 +32,7 @@ var (
 	interval int
 	pid      int32
 	name     string
+	dir      string
 )
 
 // rootCmd represents the base command when called without any subcommands

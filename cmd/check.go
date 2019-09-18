@@ -28,9 +28,12 @@ import (
 	"time"
 
 	"github.com/antonmedv/expr"
+	"github.com/k1LoW/metr/logger"
 	"github.com/k1LoW/metr/metrics"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Status int
@@ -58,14 +61,27 @@ func (s Status) String() string {
 type Result struct {
 	stdout io.Writer
 	stderr io.Writer
+	logger *zap.Logger
 }
 
-func (r *Result) exitWithStdout(status Status, warningCond string, criticalCond string, err error) int {
+func (r *Result) exitWithStdout(status Status, warningCond string, criticalCond string, ms map[string]interface{}, err error) int {
 	// SERVICE STATUS: First line of output | First part of performance data http://nagios-plugins.org/doc/guidelines.html#PLUGOUTPUT
 	if err != nil {
 		_, _ = fmt.Fprintf(r.stdout, "%s %s: %s\n", "METR", status, err)
 	} else {
 		_, _ = fmt.Fprintf(r.stdout, "%s %s: w(%s) c(%s)\n", "METR", status, warningCond, criticalCond)
+	}
+	if r.logger != nil {
+		fields := []zapcore.Field{
+			zap.String("command", "check"),
+			zap.String("warning_condition", warningCond),
+			zap.String("critical_condition", criticalCond),
+		}
+		for k, v := range ms {
+			fields = append(fields, zap.Any(k, v))
+		}
+		fields = append(fields, zap.String("result", status.String()))
+		r.logger.Info("execute metr check", fields...)
 	}
 	return int(status)
 }
@@ -87,57 +103,70 @@ var checkCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCheck(args, warningCond, criticalCond, interval, pid, name, os.Stdout, os.Stderr))
+		os.Exit(runCheck(args, warningCond, criticalCond, interval, pid, name, dir, os.Stdout, os.Stderr))
 	},
 }
 
-func runCheck(args []string, warningCond, criticalCond string, interval int, pid int32, name string, stdout, stderr io.Writer) (exitCode int) {
-	r := &Result{
-		stdout: stdout,
-		stderr: stderr,
-	}
-	if len(args) > 0 {
-		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires no args"))
-	}
-	if warningCond == "" && criticalCond == "" {
-		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, errors.New("metr requires -w or -c option"))
-	}
+func runCheck(args []string, warningCond, criticalCond string, interval int, pid int32, name, dir string, stdout, stderr io.Writer) (exitCode int) {
 	var (
 		m   *metrics.Metrics
 		err error
+		lgr *zap.Logger
 	)
+	ms := make(map[string]interface{})
+	if dir != "" {
+		lgr, err = logger.NewLogger(dir)
+	} else {
+		lgr, err = logger.NewNoLogger()
+	}
+	r := &Result{
+		stdout: stdout,
+		stderr: stderr,
+		logger: lgr,
+	}
+	if err != nil {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, ms, err)
+	}
+	if len(args) > 0 {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, ms, errors.New("metr requires no args"))
+	}
+	if warningCond == "" && criticalCond == "" {
+		return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, ms, errors.New("metr requires -w or -c option"))
+	}
 	switch {
 	case name != "":
 		m, err = metrics.GetMetricsByName(time.Duration(interval)*time.Millisecond, name)
 		if err != nil {
-			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, ms, err)
 		}
 	default:
 		m, err = metrics.GetMetrics(time.Duration(interval)*time.Millisecond, pid)
 		if err != nil {
-			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, ms, err)
 		}
 	}
 	if criticalCond != "" {
-		got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), m.Raw())
+		ms = m.Raw()
+		got, err := expr.Eval(fmt.Sprintf("(%s) == true", criticalCond), ms)
 		if err != nil {
-			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, ms, err)
 		}
 		if got.(bool) {
-			return r.exitWithStdout(CRITICAL, warningCond, criticalCond, nil)
+			return r.exitWithStdout(CRITICAL, warningCond, criticalCond, ms, nil)
 		}
 	}
 	if warningCond != "" {
-		got, err := expr.Eval(fmt.Sprintf("(%s) == true", warningCond), m.Raw())
+		ms = m.Raw()
+		got, err := expr.Eval(fmt.Sprintf("(%s) == true", warningCond), ms)
 		if err != nil {
-			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, err)
+			return r.exitWithStdout(UNKNOWN, warningCond, criticalCond, ms, err)
 		}
 		if got.(bool) {
-			return r.exitWithStdout(WARNING, warningCond, criticalCond, nil)
+			return r.exitWithStdout(WARNING, warningCond, criticalCond, ms, nil)
 		}
 	}
 
-	return r.exitWithStdout(OK, warningCond, criticalCond, nil)
+	return r.exitWithStdout(OK, warningCond, criticalCond, ms, nil)
 }
 
 func init() {
@@ -147,4 +176,5 @@ func init() {
 	checkCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	checkCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	checkCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
+	checkCmd.Flags().StringVarP(&dir, "log-dir", "", "", "log directory")
 }
