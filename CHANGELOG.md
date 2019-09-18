@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.9.0](https://github.com/k1LoW/metr/compare/v0.8.0...v0.9.0) (2019-09-18)
+
+* Add `--log-dir` option [#22](https://github.com/k1LoW/metr/pull/22) ([k1LoW](https://github.com/k1LoW))
+* Fix: metr cond does not have --name option [#21](https://github.com/k1LoW/metr/pull/21) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.8.0](https://github.com/k1LoW/metr/compare/v0.7.0...v0.8.0) (2019-09-02)
 
 * [BREAKING] Remove `proc_connections` / Fix `proc_open_files` counting logic [#20](https://github.com/k1LoW/metr/pull/20) ([k1LoW](https://github.com/k1LoW))
