@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -28,7 +29,12 @@ func TestRunCond(t *testing.T) {
 	for _, tt := range tests {
 		stdout := new(bytes.Buffer)
 		stderr := new(bytes.Buffer)
-		exitCode := runCond(tt.args, 100, tt.pid, tt.name, stdout, stderr)
+		dir, err := ioutil.TempDir("", "metr")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer os.RemoveAll(dir)
+		exitCode := runCond(tt.args, 100, tt.pid, tt.name, dir, stdout, stderr)
 		_ = stdout.String()
 		if exitCode != tt.wantExitCode {
 			t.Errorf("%s: runCond(%v, 100, stdout, stderr) = %d, want = %d", tt.desc, tt.args, exitCode, tt.wantExitCode)

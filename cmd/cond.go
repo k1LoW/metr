@@ -28,9 +28,12 @@ import (
 	"time"
 
 	"github.com/antonmedv/expr"
+	"github.com/k1LoW/metr/logger"
 	"github.com/k1LoW/metr/metrics"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // condCmd represents the cond command
@@ -48,7 +51,7 @@ var condCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCond(args, interval, pid, name, os.Stdout, os.Stderr))
+		os.Exit(runCond(args, interval, pid, name, dir, os.Stdout, os.Stderr))
 	},
 }
 
@@ -63,16 +66,27 @@ var testCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(runCond(args, interval, pid, name, os.Stdout, os.Stderr))
+		os.Exit(runCond(args, interval, pid, name, dir, os.Stdout, os.Stderr))
 	},
 }
 
-func runCond(args []string, interval int, pid int32, name string, stdout, stderr io.Writer) (exitCode int) {
+func runCond(args []string, interval int, pid int32, name, dir string, stdout, stderr io.Writer) (exitCode int) {
 	mcond := args[0]
 	var (
 		m   *metrics.Metrics
 		err error
+		lgr *zap.Logger
 	)
+	if dir != "" {
+		lgr, err = logger.NewLogger(dir)
+	} else {
+		lgr, err = logger.NewNoLogger()
+	}
+	if err != nil {
+		_, _ = fmt.Fprintf(stderr, "%s\n", err)
+		return 1
+	}
+
 	switch {
 	case name != "":
 		m, err = metrics.GetMetricsByName(time.Duration(interval)*time.Millisecond, name)
@@ -87,14 +101,26 @@ func runCond(args []string, interval int, pid int32, name string, stdout, stderr
 			return 1
 		}
 	}
-	got, err := expr.Eval(fmt.Sprintf("(%s) == true", mcond), m.Raw())
+	ms := m.Raw()
+	got, err := expr.Eval(fmt.Sprintf("(%s) == true", mcond), ms)
 	if err != nil {
 		_, _ = fmt.Fprintf(stderr, "%s\n", err)
 		return 1
 	}
+	fields := []zapcore.Field{
+		zap.String("command", "cond"),
+		zap.String("condition", mcond),
+	}
+	for k, v := range ms {
+		fields = append(fields, zap.Any(k, v))
+	}
 	if got.(bool) {
+		fields = append(fields, zap.Int("result", 0))
+		lgr.Info("execute metr cond", fields...)
 		return 0
 	} else {
+		fields = append(fields, zap.Int("result", 1))
+		lgr.Info("execute metr cond", fields...)
 		return 1
 	}
 }
@@ -103,9 +129,11 @@ func init() {
 	condCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	condCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	condCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
+	condCmd.Flags().StringVarP(&dir, "log-dir", "", "", "log directory")
 	testCmd.Flags().IntVarP(&interval, "interval", "i", 500, "metric measurement interval (millisecond)")
 	testCmd.Flags().Int32VarP(&pid, "pid", "p", 0, "PID of target process")
 	testCmd.Flags().StringVarP(&name, "name", "P", "", "Name of target process")
+	testCmd.Flags().StringVarP(&dir, "log-dir", "", "", "log directory")
 	rootCmd.AddCommand(condCmd)
 	rootCmd.AddCommand(testCmd)
 }
