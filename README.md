@@ -58,7 +58,6 @@ proc_mem:0.230384
 proc_rss:39579648
 proc_vms:4903047168
 proc_swap:0
-proc_connections:0
 cpu:0.000000
 mem:59.643674
 swap:781451264
