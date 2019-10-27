@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.9.1](https://github.com/k1LoW/metr/compare/v0.9.0...v0.9.1) (2019-10-27)
+
+* Update spf13/pflag to v1.0.5 [#23](https://github.com/k1LoW/metr/pull/23) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.9.0](https://github.com/k1LoW/metr/compare/v0.8.0...v0.9.0) (2019-09-18)
 
 * Add `--log-dir` option [#22](https://github.com/k1LoW/metr/pull/22) ([k1LoW](https://github.com/k1LoW))
