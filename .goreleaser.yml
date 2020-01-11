@@ -51,7 +51,12 @@ brews:
     email: k1lowxb@gmail.com
   homepage: https://github.com/k1LoW/metr
   description: 'metr gets system metrics.'
-  install: bin.install 'metr'
+  install: |
+    system './metr', 'completion', 'bash', '--out', 'metr.bash'
+    system './metr', 'completion', 'zsh', '--out', 'metr.zsh'
+    bin.install 'metr'
+    bash_completion.install 'metr.bash' => 'metr'
+    zsh_completion.install 'metr.zsh' => '_metr'
 nfpms:
   -
     id: metr-nfpms
