@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.10.0](https://github.com/k1LoW/metr/compare/v0.9.1...v0.10.0) (2020-01-11)
+
+* Remove completion script when remove metr [#26](https://github.com/k1LoW/metr/pull/26) ([k1LoW](https://github.com/k1LoW))
+* Install completion script when install metr via deb/rpm [#25](https://github.com/k1LoW/metr/pull/25) ([k1LoW](https://github.com/k1LoW))
+* Add `metr completion` [#24](https://github.com/k1LoW/metr/pull/24) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.9.1](https://github.com/k1LoW/metr/compare/v0.9.0...v0.9.1) (2019-10-27)
 
 * Update spf13/pflag to v1.0.5 [#23](https://github.com/k1LoW/metr/pull/23) ([k1LoW](https://github.com/k1LoW))
