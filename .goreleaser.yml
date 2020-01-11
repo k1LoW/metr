@@ -72,3 +72,5 @@ nfpms:
       - rpm
     bindir: /usr/bin
     epoch: 1
+    scripts:
+      postinstall: "misc/install_completion.sh"
