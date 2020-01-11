@@ -74,3 +74,4 @@ nfpms:
     epoch: 1
     scripts:
       postinstall: "misc/install_completion.sh"
+      postremove: "misc/remove_completion.sh"
