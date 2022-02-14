@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 package metrics
@@ -241,9 +242,15 @@ func openFiles(pid int32) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer d.Close()
 	fnames, err := d.Readdirnames(-1)
-	return fnames, err
+	if err != nil {
+		_ = d.Close()
+		return nil, err
+	}
+	if err := d.Close(); err != nil {
+		return nil, err
+	}
+	return fnames, nil
 }
 
 // copy from gopsutil/internal/common
