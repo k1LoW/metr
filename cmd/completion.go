@@ -67,7 +67,9 @@ metr completion zsh > $fpath[1]/_metr
 				_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
 				os.Exit(1)
 			}
-			defer o.Close()
+			defer func() {
+				_ = o.Close()
+			}()
 		}
 
 		switch sh {
